@@ -187,6 +187,45 @@ details.tg[open] summary::before{content:"▾ "}
 .tb{flex:none;min-height:44px;padding:6px 12px;border-radius:10px;border:1px solid var(--acc);background:var(--card);color:var(--acc);font:inherit;font-weight:700;font-size:.85rem;cursor:pointer;white-space:nowrap}
 .top{gap:8px}
 .sync{margin:-8px 0 10px;font-size:.8rem;color:var(--mut)}
+/* ✅ 현재원 체크 */
+.ick h2 .ickhn{font-size:.82rem;font-weight:700;color:var(--acc)}
+.icksub{font-size:.85rem;color:var(--mut);margin:6px 0}
+.ickpin{display:flex;gap:6px;margin-top:6px}.ickpin input{flex:1;min-width:0;min-height:40px;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font:inherit;background:var(--bg);color:var(--ink)}
+.ickpin button{min-height:40px;padding:6px 14px;border-radius:8px;border:0;background:var(--acc);color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.ickc{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin-top:4px}
+.ickc button{min-height:44px;padding:4px 2px;border-radius:9px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:700;font-size:.88rem;cursor:pointer;line-height:1.2}
+.ickc button small{display:block;font-weight:400;font-size:.68rem;color:var(--mut)}
+.ickc button[aria-pressed=true]{border-color:var(--acc);background:var(--soft);color:var(--acc)}
+.ickh2{display:flex;align-items:baseline;gap:10px;margin-top:12px}.ickh2>b{flex:1}
+.ickn{font-size:1.05rem;color:var(--mut);font-variant-numeric:tabular-nums}.ickn b{font-size:1.6rem;color:var(--ink)}.ickn.done b{color:var(--acc)}
+.ckl{list-style:none;margin:8px 0 0;padding:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.ckl li{display:grid;grid-template-columns:30px 1.6em 1fr auto;gap:10px;align-items:center;padding:7px 10px 7px 12px;border-top:1px solid var(--line);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ckl li:first-child{border-top:0}.ckl li.in{background:var(--soft)}
+.ckl .box{width:30px;height:30px;border-radius:7px;border:2px solid var(--mut);background:transparent;display:grid;place-items:center;color:#fff;padding:0;cursor:pointer}
+.ckl li.in .box{background:var(--acc);border-color:var(--acc)}
+.ckl .box svg{width:18px;height:18px;opacity:0}.ckl li.in .box svg{opacity:1}
+.ckl .no{color:var(--mut);font-size:.8rem;font-variant-numeric:tabular-nums}
+.ckl .nm{font-weight:600;min-width:0}.ckl .nm em{font-style:normal;font-size:.72rem;font-weight:700;color:var(--acc);margin-left:6px}
+.ickx{min-height:30px;padding:2px 9px;border-radius:7px;border:1px solid var(--line);background:var(--card);color:var(--mut);font:inherit;font-size:.75rem;cursor:pointer}
+.ickwhy{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:5px;padding:2px 0 4px 40px}
+.ickwhy button{min-height:34px;padding:3px 12px;border-radius:8px;border:1.5px solid var(--warn);background:var(--card);color:var(--warn);font:inherit;font-size:.82rem;font-weight:700;cursor:pointer}
+.ickwhy button.cx{border-color:var(--line);color:var(--mut);font-weight:400}
+.ickg{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:8px;font-size:.8rem;color:var(--mut)}
+.ickg>span{font-weight:700;margin-right:2px}
+.ickg button{min-height:30px;padding:2px 8px;border-radius:999px;border:1px dashed var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:.8rem;cursor:pointer}
+.ickg button small{color:var(--warn);font-weight:700}
+.ickres{margin-top:12px;padding:14px 16px;border-radius:14px;border:3px solid var(--warn);background:var(--card)}
+.ickres.all{border-color:var(--acc)}
+.ickres .irh{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.ickres .irh b{flex:1;font-size:1rem}.ickres .irh span{font-size:.85rem;color:var(--mut);font-variant-numeric:tabular-nums}
+.ickres .irn{margin-top:4px;font-size:.88rem;color:var(--mut)}.ickres .irn b{color:var(--ink)}
+.ickres .irm{margin-top:10px;font-weight:700;color:var(--warn)}.ickres .irm b{font-size:1.2rem}
+.ickres .irl{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ickres .irl span{font-size:1.25rem;font-weight:800;padding:4px 12px;border-radius:10px;background:var(--bg);border:2px solid var(--warn);color:var(--warn)}
+.ickres .irl i{font-style:normal;font-size:.75rem;font-weight:600;margin-right:5px;color:var(--mut)}
+.ickres .irok{margin-top:8px;font-size:1.3rem;font-weight:800;color:var(--acc)}
+.ickf{display:flex;align-items:center;gap:8px;margin-top:8px}.ickf .hint{flex:1;margin:0;font-size:.75rem;color:var(--mut)}
+.ickr{flex:none;min-height:36px;padding:4px 10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:.78rem;cursor:pointer}
+.ickr:disabled{opacity:.4;cursor:default}.ickr.warn{border-color:var(--warn);color:var(--warn)}
 .eb,.gsum span{white-space:nowrap}
 .eb{min-height:44px;padding:6px 14px;border-radius:10px;border:1px solid #7a3fb0;background:var(--card);color:#7a3fb0;font:inherit;font-weight:700;font-size:.85rem;cursor:pointer}
 .eb.on{background:#7a3fb0;color:#fff}
@@ -535,18 +574,78 @@ function tabs(){const T=document.getElementById("tabs");
   const A=document.getElementById("arcbox");
   A.innerHTML='<button type="button" class="arcb'+(ARC?' on':'')+'">'+(ARC?'← 날짜 보기로 돌아가기':'🗂 지난 기록 보기 <small>'+(ARCH.length?ARCH.length+'일':GRADE.some(o=>o.ok)?'확인 공지':'아직 없음')+'</small>')+'</button>';
   A.querySelector("button").onclick=()=>{ARC=!ARC;tabs();show();window.scrollTo(0,0)}}
+// ── ✅ 현재원 체크 (반별, 날짜 탭마다) ──
+// 명렬표는 학생 이름이라 공개 코드에 없음: 비번(잠금 공지 비번과 같음)을 넣으면 Apps Script에서 받아 이 기기에 저장
+// 체크·빼기는 이 기기에만 날짜·반별로 저장 (localStorage "jck:날짜:반") · 2반은 D 출결대로 결석·조퇴 등이 자동으로 빠짐
+const LS={get(k,v){try{const s=localStorage.getItem(k);return s==null?v:JSON.parse(s)}catch(e){return v}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let JR=LS.get("jroster",null),JC=+LS.get("jcls",0)||0,ICKW="",ICKMSG="";
+const ICK_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function ickBusy(){const a=document.activeElement;return !!(ICKW||(a&&a.closest&&a.closest("#ick")&&a.tagName==="INPUT"))}
+function ickRefresh(){const p=LS.get("jrpin","");if(!p)return; // 열 때마다 뒤에서 명렬표·2반 출결 새로 받음
+  google.script.run.withSuccessHandler(r=>{if(r&&r.cls){JR=r;LS.set("jroster",r);if(!ickBusy())ickDraw()}})
+    .withFailureHandler(er=>{if(/비밀번호/.test((er&&er.message)||"")){LS.set("jrpin","");JR=null;try{localStorage.removeItem("jroster")}catch(e){}ickDraw()}}).roster(p)}
+function ickState(d,c){const s=LS.get("jck:"+d+":"+c,{});return {ck:new Set(s.ck||[]),out:s.out||{},t:s.t||""}}
+function ickSave(d,c,s){LS.set("jck:"+d+":"+c,{ck:[...s.ck],out:s.out,t:nowHM()})}
+function ickModel(d,c){ // 반 c, 날짜 d: 있어야 하는 학생(pres) / 빠진 학생(gone)
+  const C=(JR.cls||[]).find(o=>o.c===c);if(!C)return null;
+  const S=ickState(d,c),auto={},tag={},hm=nowHM();
+  C.s.forEach(([no,n,f])=>{if(f)auto[no]=f});
+  const A=c===2&&JR.att2&&JR.att2[d];
+  if(A&&A.list){const L=A.list,put=(k,why)=>(L[k]||[]).forEach(o=>{if(o.no)auto[o.no]=why});
+    put("trip","교외체험");put("rec","인정결석");put("abs","결석");put("wait","지각 예정");put("pend","확인 중");put("etc","위탁");
+    (L.late||[]).forEach(o=>{if(o.no)tag[o.no]="지각"});
+    (L.early||[]).forEach(o=>{if(!o.no)return;if(o.t&&(d>today||(d===today&&o.t>hm)))tag[o.no]="조퇴 예정 "+o.t;else auto[o.no]="조퇴"})}
+  if(A&&A.skip)A.skip.list.forEach(s=>{const hit=C.s.find(([no,n])=>(s.no&&no===s.no)||(!s.no&&n===s.n));if(hit)auto[hit[0]]=A.skip.why||"체크 안 함"});
+  const pres=[],gone=[];
+  C.s.forEach(([no,n])=>{const man=S.out[no],why=man===undefined?auto[no]:man;
+    if(why)gone.push({no,n,why,man:man!==undefined});else pres.push({no,n,t:tag[no]||"",on:S.ck.has(no)})});
+  return {C,S,pres,gone,auto}}
+function ickDraw(){const box=document.getElementById("ickb"),hn=document.getElementById("ickhn");if(!box)return;
+  const d=days[i];
+  if(!JR){hn.textContent="";box.innerHTML='<p class="icksub">반 명렬표를 열려면 비번을 넣어 주세요 (🔒 잠금 공지 비번과 같아요). 한 번 넣으면 이 기기에서 계속 열려요.</p>'
+      +'<div class="ickpin"><input type="password" inputmode="numeric" id="ickpin" placeholder="비번" autocomplete="off"><button type="button" id="ickgo">명렬표 열기</button></div><div class="msg" id="ickmsg">'+esc(ICKMSG)+'</div>';
+    const go=()=>{const v=document.getElementById("ickpin").value.trim();if(!v)return;const b=document.getElementById("ickgo");b.disabled=true;b.textContent="여는 중…";
+      google.script.run.withSuccessHandler(r=>{ICKMSG="";JR=r;LS.set("jroster",r);LS.set("jrpin",v);ickDraw()})
+        .withFailureHandler(er=>{ICKMSG=(er&&er.message)||"비번이 틀렸어요";ickDraw()}).roster(v)};
+    document.getElementById("ickgo").onclick=go;document.getElementById("ickpin").onkeydown=e=>{if(e.key==="Enter")go()};return}
+  const cls=JR.cls||[];
+  let h='<div class="ickc" role="group" aria-label="반 고르기">'+cls.map(o=>'<button type="button" data-c="'+o.c+'" aria-pressed="'+(o.c===JC)+'">'+o.c+'반<small>'+esc(o.t||"")+'</small></button>').join("")+'</div>';
+  const M=JC?ickModel(d,JC):null;
+  if(!M){hn.textContent="";box.innerHTML=h+'<p class="icksub">반을 고르면 명렬표가 나와요 · 날짜 탭마다 따로 체크돼요</p>';ickBindC(box);return}
+  const {S,pres,gone}=M,n=pres.filter(o=>o.on).length,lab=(()=>{const t=new Date(d+"T12:00:00");return (t.getMonth()+1)+"/"+t.getDate()+"("+W[t.getDay()]+")"})();
+  hn.textContent="· "+JC+"반 "+n+"/"+pres.length;
+  h+='<div class="ickh2"><b>'+JC+'반 · '+lab+'</b><span class="ickn'+(pres.length&&n>=pres.length?' done':'')+'"><b>'+n+'</b> / '+pres.length+'</span></div>';
+  h+='<ul class="ckl">'+pres.map(o=>'<li class="'+(o.on?'in':'')+'" data-no="'+esc(o.no)+'"><button type="button" class="box" aria-pressed="'+o.on+'" aria-label="'+esc(o.n)+(o.on?' 확인 취소':' 확인')+'">'+ICK_SVG+'</button><span class="no">'+esc(o.no.slice(-2))+'</span><span class="nm">'+esc(o.n)+(o.t?'<em>'+esc(o.t)+'</em>':'')+'</span><button type="button" class="ickx" data-x="'+esc(o.no)+'" aria-label="'+esc(o.n)+' 빼기">빼기</button>'
+    +(ICKW===o.no?'<div class="ickwhy">'+["결석","조퇴","교외체험","기타"].map(w=>'<button type="button" data-w="'+w+'">'+w+'</button>').join("")+'<button type="button" data-w="" class="cx">취소</button></div>':'')+'</li>').join("")+'</ul>';
+  if(gone.length)h+='<div class="ickg"><span>빠진 학생</span>'+gone.map(o=>'<button type="button" data-back="'+esc(o.no)+'" title="다시 넣기">'+esc(o.n)+' <small>'+esc(o.why)+'</small> ↺</button>').join("")+'</div>';
+  h+='<div class="ickres" id="ickres" hidden></div><div class="ickf"><span class="hint">이름을 눌러 체크 · 안 온 학생은 \'빼기\'(결석·조퇴 등) · 체크하면 📸 칸이 떠요(캡처해서 보내기) · 이 기기에만 저장</span><button type="button" class="ickr"'+(n||Object.keys(S.out).length?'':' disabled')+'>모두 지우기</button></div>';
+  box.innerHTML=h;ickBindC(box);
+  box.querySelectorAll(".ckl li").forEach(li=>li.onclick=e=>{if(e.target.closest(".ickx,.ickwhy"))return;const s=ickState(d,JC),k=li.dataset.no;s.ck.has(k)?s.ck.delete(k):s.ck.add(k);ickSave(d,JC,s);ickDraw()});
+  box.querySelectorAll(".ickx").forEach(b=>b.onclick=()=>{ICKW=ICKW===b.dataset.x?"":b.dataset.x;ickDraw()});
+  box.querySelectorAll(".ickwhy button").forEach(b=>b.onclick=()=>{const no=ICKW;ICKW="";if(b.dataset.w){const s=ickState(d,JC);s.out[no]=b.dataset.w;s.ck.delete(no);ickSave(d,JC,s)}ickDraw()});
+  box.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>{const s=ickState(d,JC),no=b.dataset.back; // ↺ 다시 넣기: 자동으로 빠진 학생이면 ""(억지로 넣음), 손으로 뺀 학생이면 기록 지움
+    if(M.auto[no])s.out[no]="";else delete s.out[no];ickSave(d,JC,s);ickDraw()});
+  const r=box.querySelector(".ickr");r.onclick=()=>{if(r.dataset.sure){LS.set("jck:"+d+":"+JC,{});ickDraw();return}r.dataset.sure="1";r.textContent="정말? 한 번 더";r.classList.add("warn");setTimeout(()=>{if(r.isConnected&&r.dataset.sure){delete r.dataset.sure;r.textContent="모두 지우기";r.classList.remove("warn")}},3000)};
+  const R=document.getElementById("ickres");if(n){const miss=pres.filter(o=>!o.on);R.hidden=false;R.className="ickres"+(miss.length?"":" all");
+    R.innerHTML='<div class="irh"><b>📸 3학년 '+JC+'반 현재원 확인</b><span>'+esc(lab+" "+(S.t||nowHM()))+'</span></div>'
+      +'<div class="irn">재적 '+(pres.length+gone.length)+'명'+(gone.length?' · 빠짐 '+gone.length+'명 ('+gone.map(o=>esc(o.n)+' '+esc(o.why)).join(', ')+')':'')+'</div>'
+      +'<div class="irn">현재원 '+pres.length+'명 중 <b>'+n+'명</b> 확인</div>'
+      +(miss.length?'<div class="irm">아직 안 보이는 학생 <b>'+miss.length+'명</b></div><div class="irl">'+miss.map(o=>'<span><i>'+esc(o.no.slice(-2))+'</i>'+esc(o.n)+'</span>').join("")+'</div>':'<div class="irok">✅ 전원 있음</div>')}}
+function ickBindC(box){box.querySelectorAll(".ickc button").forEach(b=>b.onclick=()=>{JC=+b.dataset.c;LS.set("jcls",JC);ICKW="";ickDraw()})}
 function show(){
   const m=document.getElementById("main");
   ["pre","extra","memo"].forEach(id=>{const e=document.getElementById(id);if(e)e.hidden=ARC});
   if(ARC){m.innerHTML=archHTML();document.getElementById("mgr").innerHTML="";m.querySelectorAll("[data-unok]").forEach(b=>b.onclick=()=>{b.disabled=true;gCall("gradeConfirm",{id:b.dataset.unok,on:false},null)});return}
   if(!days.length){m.innerHTML='<div class="card empty">아직 올라온 공지가 없어요.</div>';return}
   const d=days[i],x=DATA[d]||{},dt=new Date(d+"T12:00:00");
-  let h=tCard(d)+gCard(d)+(DATA[d]?'':'<div class="offday">등교일 아님 · 아이들 공지 없음</div>');
+  let h='<div class="card ick" id="ick"><h2>✅ 현재원 체크 <span class="ickhn" id="ickhn"></span></h2><div id="ickb"></div></div>'
+    +tCard(d)+gCard(d)+(DATA[d]?'':'<div class="offday">등교일 아님 · 아이들 공지 없음</div>');
   const NSUB='<div class="nsub">2반 공지예요. 반 상황에 맞게 고쳐서 공지해 주세요.</div>';CP="";
   if(x.notice){const T=renum(noClass(String(x.notice.text||"").replace(/^\[x\]\s?/gm,""))),R=tkRender(T,false);CP=T;
     h+='<div class="card notice-card"><div class="nh"><h2>📢 아이들 공지 (2반 기준)</h2><button type="button" class="cp" id="cp">📋 복사</button></div>'+NSUB+'<div class="tk">'+R.html+'</div><div class="at">출처: '+esc(RAW.src||"2반")+(x.notice.at?' · '+esc(x.notice.at)+' 갱신':'')+'</div></div>'}
   else if(DATA[d])h+='<div class="card notice-card"><div class="nh"><h2>📢 아이들 공지 (2반 기준)</h2></div>'+NSUB+'<div class="empty">이 날 공지는 아직 없어요.</div></div>';
   m.innerHTML=h;
+  ickDraw();
   if(d===today)tkNowDot(m);
   const cpb=document.getElementById("cp");if(cpb)cpb.onclick=()=>copyNotice(cpb);
   document.getElementById("memo").innerHTML=mCard();
@@ -565,7 +664,7 @@ document.addEventListener("click",e=>{const b=e.target.closest(".tdk");if(!b||!E
     .withFailureHandler(err=>{on?DONE.delete(id):DONE.add(id);extras();show();alert((err&&err.message)||"저장 실패")}).taskDone(PIN,{id,t:b.dataset.t,on})},SIG);
 // ── 📌 3학년 공지 + 🗂 메모: 웹 편집 모드에서 추가·수정·삭제·종류 바꾸기·게시 기간·마감일·중요 (편집 비밀번호) ──
 let EDIT=false,PIN="",REV=new Set(),OPEN=new Set();try{PIN=sessionStorage.getItem("gpin")||""}catch(e){}
-BUSY=()=>EDIT||!!document.querySelector(".gf"); // 편집 중엔 새 데이터로 화면을 갈아엎지 않음
+BUSY=()=>EDIT||!!document.querySelector(".gf")||ickBusy(); // 편집 중엔 새 데이터로 화면을 갈아엎지 않음
 const FOREVER="2099-12-31";
 const dDiff=(a,b)=>Math.round((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/864e5);
 const gLive=(o,d)=>o.s<=d&&d<=o.e;
@@ -742,7 +841,8 @@ document.addEventListener("click",e=>{const b=e.target.closest(".lcp");if(!b)ret
   const fb=()=>{const ta=document.createElement("textarea");ta.value=u;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();let k=false;try{k=document.execCommand("copy")}catch(x){}ta.remove();if(k)ok();else prompt("길게 눌러 복사하세요",u)};
   try{navigator.clipboard.writeText(u).then(ok,fb)}catch(x){fb()}},SIG); // 🔗 링크 복사 버튼
 extras();tabs();show();
-BOOT_TM=setInterval(()=>{if(!document.querySelector(".gf"))show()},60000); // 시간이 지나면 조퇴 예정 → 조퇴로 바뀜
+ickRefresh();
+BOOT_TM=setInterval(()=>{if(!document.querySelector(".gf")&&!ickBusy())show()},60000); // 시간이 지나면 조퇴 예정 → 조퇴로 바뀜
 }
 }
 START();
