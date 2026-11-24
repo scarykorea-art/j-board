@@ -489,6 +489,7 @@ function START(){
 function BOOT(RAW){
 if(BOOT_AC)BOOT_AC.abort();BOOT_AC=new AbortController();const SIG={signal:BOOT_AC.signal};clearInterval(BOOT_TM);
 RAW=Object.assign({},RAW,{url:location.href.split("#")[0]});
+["main","memo","mgr"].forEach(id=>{const e=document.getElementById(id);if(e)e._h=null}); // 새 데이터면 무조건 다시 그림
 {
 // ── 공지 렌더러 (D와 알림판이 똑같이 씀) ──
 // 표시법: {box}제목 … {/box} = 안내 박스(안의 "등교: 08:20"처럼 쓰면 칸으로) · 줄 맨 앞 [x] = 끝난 일(취소선) · **굵게** · {r}빨강{/} {b}파랑{/} {g}초록{/} {o}주황{/} · {L}크게{/} {S}작게{/}
@@ -641,8 +642,8 @@ function ickBindC(box){box.querySelectorAll(".ickc button").forEach(b=>b.onclick
 function show(){
   const m=document.getElementById("main");
   ["pre","extra","memo"].forEach(id=>{const e=document.getElementById(id);if(e)e.hidden=ARC});
-  if(ARC){m.innerHTML=archHTML();document.getElementById("mgr").innerHTML="";m.querySelectorAll("[data-unok]").forEach(b=>b.onclick=()=>{b.disabled=true;gCall("gradeConfirm",{id:b.dataset.unok,on:false},null)});return}
-  if(!days.length){m.innerHTML='<div class="card empty">아직 올라온 공지가 없어요.</div>';return}
+  if(ARC){m._h=null;document.getElementById("mgr")._h=null;m.innerHTML=archHTML();document.getElementById("mgr").innerHTML="";m.querySelectorAll("[data-unok]").forEach(b=>b.onclick=()=>{b.disabled=true;gCall("gradeConfirm",{id:b.dataset.unok,on:false},null)});return}
+  if(!days.length){m._h=null;m.innerHTML='<div class="card empty">아직 올라온 공지가 없어요.</div>';return}
   const d=days[i],x=DATA[d]||{},dt=new Date(d+"T12:00:00");
   let h='<div class="card ick" id="ick"><h2>✅ 현재원 체크 <span class="ickhn" id="ickhn"></span></h2><div id="ickb"></div></div>'
     +tCard(d)+gCard(d)+(DATA[d]?'':'<div class="offday">등교일 아님 · 아이들 공지 없음</div>');
@@ -650,13 +651,14 @@ function show(){
   if(x.notice){const T=renum(noClass(String(x.notice.text||"").replace(/^\[x\]\s?/gm,""))),R=tkRender(T,false);CP=T;
     h+='<div class="card notice-card"><div class="nh"><h2>📢 아이들 공지 (2반 기준)</h2><button type="button" class="cp" id="cp">📋 복사</button></div>'+NSUB+'<div class="tk">'+R.html+'</div><div class="at">출처: '+esc(RAW.src||"2반")+(x.notice.at?' · '+esc(x.notice.at)+' 갱신':'')+'</div></div>'}
   else if(DATA[d])h+='<div class="card notice-card"><div class="nh"><h2>📢 아이들 공지 (2반 기준)</h2></div>'+NSUB+'<div class="empty">이 날 공지는 아직 없어요.</div></div>';
-  m.innerHTML=h;
-  ickDraw();
+  // 깜박임 방지: 1분마다 다시 그릴 때 내용이 그대로면 화면을 갈아엎지 않음 (지금 시각 점만 옮김)
+  const me=document.getElementById("memo"),mg=document.getElementById("mgr"),mh=mCard(),gh=EDIT?gMgr():"";
+  const sameM=m._h===h,sameO=me._h===mh&&mg._h===gh;
+  if(!sameM){m.innerHTML=h;m._h=h;ickDraw();const cpb=document.getElementById("cp");if(cpb)cpb.onclick=()=>copyNotice(cpb)}
   if(d===today)tkNowDot(m);
-  const cpb=document.getElementById("cp");if(cpb)cpb.onclick=()=>copyNotice(cpb);
-  document.getElementById("memo").innerHTML=mCard();
-  document.getElementById("mgr").innerHTML=EDIT?gMgr():"";
-  gBind(d);scrInit();
+  if(me._h!==mh){me.innerHTML=mh;me._h=mh}
+  if(mg._h!==gh){mg.innerHTML=gh;mg._h=gh}
+  if(!sameM||!sameO){gBind(d);scrInit()}
 }
 // ── 선생님 할 일 (A에서 학교 일만 골라온 것) ──
 function tFmt(s){return esc(s).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\{btn\}\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<span class="lb"><a class="lbtn" href="$2" target="_blank" rel="noopener">$1 ↗</a><button type="button" class="lcp" data-url="$2">🔗 복사</button></span>').replace(/\{go\}\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<span class="lb"><a class="lbtn go" href="$2" target="_blank" rel="noopener">$1 ↗</a></span>').replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')}
@@ -866,7 +868,7 @@ START();
     if(!SEEN.has(c)){SEEN.add(c);c.classList.add("qf");h.classList.add("fh");
       h.addEventListener("click",e=>{if(e.target.closest("button,a,input,label,select,textarea"))return;if(OPEN.has(k))OPEN.delete(k);else OPEN.add(k);c.classList.toggle("fold",!OPEN.has(k))})}
     c.classList.toggle("fold",!OPEN.has(k))})}
-  let tm=0;new MutationObserver(()=>{clearTimeout(tm);tm=setTimeout(apply,0)}).observe(document.body,{childList:true,subtree:true});apply();
+  new MutationObserver(()=>apply()).observe(document.body,{childList:true,subtree:true});apply(); // 그리기 전에 바로 접기 적용 (카드가 잠깐 펼쳐졌다 접히는 깜박임 방지)
   const btn=document.createElement("button"),menu=document.createElement("div");
   btn.type="button";btn.className="qjbtn";btn.id="qjBtn";btn.textContent="🧭 바로가기";btn.setAttribute("aria-expanded","false");
   menu.className="qjmenu";menu.hidden=true;menu.setAttribute("role","menu");document.body.append(menu,btn);
