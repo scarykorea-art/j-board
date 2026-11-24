@@ -185,7 +185,13 @@ details.tg[open] summary::before{content:"▾ "}
 .top{display:flex;align-items:center;gap:10px;margin:4px 0 14px}
 .top h1{margin:0;flex:1}
 .tb{flex:none;min-height:44px;padding:6px 12px;border-radius:10px;border:1px solid var(--acc);background:var(--card);color:var(--acc);font:inherit;font-weight:700;font-size:.85rem;cursor:pointer;white-space:nowrap}
-.top{gap:8px}
+.top{gap:6px}
+/* 제목줄 정리 (11/24): 제목 한 줄, 버튼은 작은 알약 */
+.top h1{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:clamp(1.12rem,5.4vw,1.5rem);letter-spacing:-.01em}
+.top h1 .hi{font-size:.82em;margin-right:5px;vertical-align:.04em}
+.top .tb,.top .eb{min-height:36px;padding:4px 10px;border-radius:999px;font-size:.8rem;display:inline-flex;align-items:center;gap:4px;line-height:1}
+.top .bi{font-style:normal;font-size:.95em}
+@media(max-width:380px){.tabs .tw button{font-size:.86rem;padding:6px 1px;letter-spacing:-.02em}.tabs .nv{flex-basis:28px;min-width:28px}}
 .sync{margin:-8px 0 10px;font-size:.8rem;color:var(--mut)}
 /* ✅ 현재원 체크 */
 .ick h2 .ickhn{font-size:.82rem;font-weight:700;color:var(--acc)}
@@ -443,7 +449,7 @@ details.tg[open] summary::before{content:"▾ "}
 @keyframes qjflK{0%{box-shadow:0 0 0 3px var(--acc,#1f6b4a)}100%{box-shadow:0 0 0 3px transparent}}
 .qjfl{animation:qjflK 1.6s ease-out}
 </style></head><body><div class="wrap">
-<div class="top"><h1>📋 3학년부 데일리 보드</h1><button type="button" class="tb" id="tb" aria-label="오늘로 돌아가기">📅 오늘</button><button type="button" class="eb" id="eb">✏️ 공지 편집</button></div>
+<div class="top"><h1><span class="hi">📋</span>3학년부 데일리 보드</h1><button type="button" class="tb" id="tb" aria-label="오늘로 돌아가기"><i class="bi">📅</i>오늘</button><button type="button" class="eb" id="eb" aria-label="공지 편집"><i class="bi">✏️</i>편집</button></div>
 <div id="sync" class="sync" hidden></div>
 <div id="pinbox"></div>
 <div id="mgr"></div>
@@ -795,7 +801,7 @@ function gUnlock(b){ // 🔒 잠금 공지 보기: 비번 맞을 때만 서버�
   if(EDIT&&PIN)return go(PIN); // 편집 모드 아닐 땐 저장된 비번이 있어도 매번 직접 치게
   const box=b.parentNode;box.classList.add("scr");box.innerHTML='<input type="password" class="lkin" inputmode="numeric" autocomplete="off" placeholder="비번 4자리"><button type="button" class="mini unl">🪙 긁기</button><span class="msg"></span>';
   const i=box.querySelector("input"),k=box.querySelector("button");const f=()=>{const v=i.value.trim();if(v){b=k;go(v)}};k.onclick=f;i.onkeydown=e=>{if(e.key==="Enter")f()};i.focus()}
-function setEdit(on){EDIT=on;const b=document.getElementById("eb");b.textContent=on?"✓ 편집 끝":"✏️ 공지 편집";b.classList.toggle("on",on);document.getElementById("pinbox").innerHTML="";extras();show();if(on&&GRADE.some(o=>o.locked))gCall("gradeUnlock",null,null);if(on){const g=document.getElementById("mgc");if(g)g.scrollIntoView({block:"nearest"})}}
+function setEdit(on){EDIT=on;const b=document.getElementById("eb");b.innerHTML=on?'<i class="bi">✓</i>끝':'<i class="bi">✏️</i>편집';b.setAttribute("aria-label",on?"편집 끝내기":"공지 편집");b.classList.toggle("on",on);document.getElementById("pinbox").innerHTML="";extras();show();if(on&&GRADE.some(o=>o.locked))gCall("gradeUnlock",null,null);if(on){const g=document.getElementById("mgc");if(g)g.scrollIntoView({block:"nearest"})}}
 function pinForm(){const p=document.getElementById("pinbox");
   p.innerHTML='<div class="card pf"><label>편집 비밀번호<input type="password" id="pin" inputmode="numeric" autocomplete="off"></label><button type="button" id="pinok">확인</button><button type="button" class="ghost" id="pinno">닫기</button><span class="msg" id="pinmsg"></span></div>';
   const go=()=>{const v=document.getElementById("pin").value.trim(),m=document.getElementById("pinmsg");if(!v)return;m.textContent="확인 중…";
