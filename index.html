@@ -31,6 +31,10 @@ h1{font:700 1.5rem/1.2"Gowun Dodum","IBM Plex Sans KR",sans-serif;margin:4px 0 1
 .tabs .tw{flex:1 1 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;min-width:0}
 .tabs .nv{flex:0 0 34px;min-width:34px;padding:0;border-radius:10px;font-size:1.3rem;font-weight:800;color:var(--acc)}
 .tabs .nv:disabled{opacity:.25;cursor:default}
+/* 고른 날짜는 늘 가운데, 양옆(전날·다음 날)은 흐리게 (11/25) */
+.tabs .tw button[aria-selected=false]{opacity:.45;transform:scale(.94)}
+.tabs .tw button[aria-selected=false]:hover{opacity:.75}
+.tabs .tw .ph{visibility:hidden}
 .card,.tabs button{background:var(--card)}
 .tabs button{flex:0 0 auto;min-width:0;padding:6px 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-height:56px;border-radius:12px;border:2px solid var(--line);color:var(--ink);font:inherit;font-weight:700;cursor:pointer;line-height:1.25}
 .tabs button small{display:block;font-weight:400;font-size:.78rem;color:var(--mut)}
@@ -604,8 +608,8 @@ const lab=d=>{const t=new Date(d+"T12:00:00");return (t.getMonth()+1)+"/"+t.getD
 let TW=0; // 날짜 탭 창 시작 위치 (3개씩)
 function tabs(){const T=document.getElementById("tabs");
   const B=days.map((d,k)=>'<button type="button" role="tab"'+(DATA[d]&&DATA[d].pink?' class="pink" title="2반 '+esc(DATA[d].pink)+'"':'')+' aria-selected="'+(!ARC&&k===i)+'" data-i="'+k+'">'+lab(d)+'<small>'+(d===today?"오늘":d===SCH.find(x=>x>today)?"다음 등교일":DATA[d]?(!ARC&&k===i?"":"&nbsp;"):"쉼")+(!ARC&&k===i?" 📅":"")+'</small></button>'); // 날짜가 크게, 오늘·다음 등교일·쉼은 아래 작게 · 고른 탭엔 📅(누르면 달력)
-  const mx=Math.max(0,B.length-3);if(!ARC){if(i<TW)TW=i;if(i>TW+2)TW=i-2}TW=Math.min(Math.max(0,TW),mx);
-  T.innerHTML='<button type="button" class="nv" data-nv="-1" aria-label="이전 날짜"'+(i<=0&&!ARC?' disabled':'')+'>‹</button><div class="tw">'+B.slice(TW,TW+3).join("")+'</div><button type="button" class="nv" data-nv="1" aria-label="다음 날짜"'+(i>=days.length-1&&!ARC?' disabled':'')+'>›</button>';
+  const W3=[i-1,i,i+1].map(k=>B[k]||'<span class="ph"></span>').join(""); // 고른 날을 늘 가운데 (첫날·끝날이면 빈 칸)
+  T.innerHTML='<button type="button" class="nv" data-nv="-1" aria-label="이전 날짜"'+(i<=0&&!ARC?' disabled':'')+'>‹</button><div class="tw">'+W3+'</div><button type="button" class="nv" data-nv="1" aria-label="다음 날짜"'+(i>=days.length-1&&!ARC?' disabled':'')+'>›</button>';
   T.querySelectorAll("button.nv").forEach(b=>b.onclick=()=>{if(ARC){ARC=false}else{i=Math.min(Math.max(0,i+ +b.dataset.nv),days.length-1)}tabs();show()});
   T.querySelectorAll(".tw button").forEach(b=>b.onclick=()=>{if(!ARC&&+b.dataset.i===i)return calOpen();ARC=false;i=+b.dataset.i;tabs();show()}); // 이미 고른 탭을 또 누르면 달력
   const A=document.getElementById("arcbox");
@@ -896,7 +900,7 @@ function extras(){ // 🔭 그 다음 학교 일정 = 지금 고른 날짜 탭 �
   if(G.length)h+='<details class="card tc tg" open><summary>📦 기간 할 일</summary>'+G.map(g=>'<h3>'+esc(gLabel(g.label))+'</h3>'+tItems(g.items)).join("")+'</details>';
   if(later.length)h+='<details class="card tc tg"><summary>🔭 그 다음 학교 일정</summary>'+later.map(x=>'<h3>'+esc(x.label)+'</h3>'+tItems(x.items)).join("")+'</details>';
   put("extra",h);
-  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v9';
+  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v10';
 }
 document.addEventListener("click",e=>{const b=e.target.closest(".lcp");if(!b)return;const u=b.dataset.url,ok=()=>{b.textContent="복사됨 ✓";setTimeout(()=>b.textContent="🔗 복사",1500)};
   const fb=()=>{const ta=document.createElement("textarea");ta.value=u;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();let k=false;try{k=document.execCommand("copy")}catch(x){}ta.remove();if(k)ok();else prompt("길게 눌러 복사하세요",u)};
