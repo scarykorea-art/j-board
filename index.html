@@ -47,6 +47,16 @@ h1{font:700 1.5rem/1.2"Gowun Dodum","IBM Plex Sans KR",sans-serif;margin:4px 0 1
   :root{--tk-line2:#4a5a52;--tk-red:#ff7b7b;--tk-blue:#7cb4ff;--tk-green:#5fd08f;--tk-orange:#ffad5c}
 }
 .notice-card{border:2px solid var(--acc);padding:18px 18px 14px;box-shadow:0 6px 20px rgba(31,107,76,.1)}
+/* 🌸 분홍 날 (D와 같은 기준: 2반 결석 15명 이상 또는 전원 결석) */
+:root{--pink:#c2417a;--pink-soft:#fbe0ec}
+@media (prefers-color-scheme:dark){:root{--pink:#f08cb8;--pink-soft:#40222f}}
+.tabs button.pink{border-color:var(--pink);background:var(--pink-soft);color:var(--pink)}
+.tabs button.pink small{color:var(--pink)}
+.tabs button.pink[aria-selected=true]{border-color:var(--pink);background:var(--pink);color:#fff}
+.tabs button.pink[aria-selected=true] small{color:#fff}
+.notice-card.pinkday{border-color:var(--pink)!important;background:var(--pink-soft)}
+.notice-card.pinkday .nh h2{color:var(--pink)}
+.pinkln{margin:0 0 8px;font-size:.85rem;font-weight:700;color:var(--pink)}
 .notice-card .nh{display:flex;align-items:center;gap:8px;margin:0 0 10px}
 .notice-card .nh h2{margin:0;font-size:1.2rem}
 .tk{font-size:16px;line-height:1.6;color:var(--tk-ink)}
@@ -573,7 +583,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 const lab=d=>{const t=new Date(d+"T12:00:00");return (t.getMonth()+1)+"/"+t.getDate()+" ("+W[t.getDay()]+")"};
 let TW=0; // 날짜 탭 창 시작 위치 (3개씩)
 function tabs(){const T=document.getElementById("tabs");
-  const B=days.map((d,k)=>'<button type="button" role="tab" aria-selected="'+(!ARC&&k===i)+'" data-i="'+k+'">'+lab(d)+'<small>'+(d===today?"오늘":d===SCH.find(x=>x>today)?"다음 등교일":DATA[d]?"&nbsp;":"쉼")+'</small></button>'); // 날짜가 크게, 오늘·다음 등교일·쉼은 아래 작게
+  const B=days.map((d,k)=>'<button type="button" role="tab"'+(DATA[d]&&DATA[d].pink?' class="pink" title="2반 '+esc(DATA[d].pink)+'"':'')+' aria-selected="'+(!ARC&&k===i)+'" data-i="'+k+'">'+lab(d)+'<small>'+(d===today?"오늘":d===SCH.find(x=>x>today)?"다음 등교일":DATA[d]?"&nbsp;":"쉼")+'</small></button>'); // 날짜가 크게, 오늘·다음 등교일·쉼은 아래 작게
   const mx=Math.max(0,B.length-3);if(!ARC){if(i<TW)TW=i;if(i>TW+2)TW=i-2}TW=Math.min(Math.max(0,TW),mx);
   T.innerHTML='<button type="button" class="nv" data-nv="-1" aria-label="이전 날짜"'+(i<=0&&!ARC?' disabled':'')+'>‹</button><div class="tw">'+B.slice(TW,TW+3).join("")+'</div><button type="button" class="nv" data-nv="1" aria-label="다음 날짜"'+(i>=days.length-1&&!ARC?' disabled':'')+'>›</button>';
   T.querySelectorAll("button.nv").forEach(b=>b.onclick=()=>{if(ARC){ARC=false}else{i=Math.min(Math.max(0,i+ +b.dataset.nv),days.length-1)}tabs();show()});
@@ -651,6 +661,7 @@ function show(){
   if(x.notice){const T=renum(noClass(String(x.notice.text||"").replace(/^\[x\]\s?/gm,""))),R=tkRender(T,false);CP=T;
     h+='<div class="card notice-card"><div class="nh"><h2>📢 아이들 공지 (2반 기준)</h2><button type="button" class="cp" id="cp">📋 복사</button></div>'+NSUB+'<div class="tk">'+R.html+'</div><div class="at">출처: '+esc(RAW.src||"2반")+(x.notice.at?' · '+esc(x.notice.at)+' 갱신':'')+'</div></div>'}
   else if(DATA[d])h+='<div class="card notice-card"><div class="nh"><h2>📢 아이들 공지 (2반 기준)</h2></div>'+NSUB+'<div class="empty">이 날 공지는 아직 없어요.</div></div>';
+  if(x.pink)h=h.replace('<div class="card notice-card"><div class="nh">','<div class="card notice-card pinkday"><div class="nh">').replace(NSUB,NSUB+'<p class="pinkln">🌸 2반 15명 이상 교외체험(결석) 쓰는 날 · '+esc(x.pink)+'</p>'); // D 학급톡 분홍과 같은 기준 (11/25)
   // 깜박임 방지: 1분마다 다시 그릴 때 내용이 그대로면 화면을 갈아엎지 않음 (지금 시각 점만 옮김)
   const me=document.getElementById("memo"),mg=document.getElementById("mgr"),mh=mCard(),gh=EDIT?gMgr():"";
   const sameM=m._h===h,sameO=me._h===mh&&mg._h===gh;
