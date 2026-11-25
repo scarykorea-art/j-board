@@ -557,7 +557,7 @@ function tkNowDot(root,selSec){ // 오늘 일정: 지금 시각 위치에 반짝
   if(!sec.offsetWidth||!sec.offsetHeight)return; // 안 보일 땐 점 안 찍음
   const its=[...sec.querySelectorAll(".tk-item")];if(!its.length)return;
   const p=nowHM().split(":"),now=(+p[0])*60+(+p[1]);
-  const T=its.map(e=>{const t=e.querySelector(".tk-time"),m=t&&t.textContent.match(/(\d{1,2}):(\d{2})/);return m?(+m[1])*60+(+m[2]):null});
+  const T=its.map(e=>{const t=e.querySelector(".tk-time")||e.querySelector(".tk-bd"),m=t&&t.textContent.match(/^\s*(\d{1,2}):(\d{2})/);return m?(+m[1])*60+(+m[2]):null});
   const P=T.map((t,k)=>t===null?-1:k).filter(k=>k>=0);if(!P.length)return;
   const R=sec.getBoundingClientRect(),bx=R.left+sec.clientLeft,by=R.top+sec.clientTop,pos=k=>{const c=its[k].querySelector(".tk-ck")||its[k],r=c.getBoundingClientRect();return {x:r.left+r.width/2-bx,y:r.top+r.height/2-by}};
   let a=-1;for(const k of P)if(T[k]<=now)a=k;
