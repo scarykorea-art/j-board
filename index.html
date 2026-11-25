@@ -611,8 +611,8 @@ function tabs(){const T=document.getElementById("tabs");
   const B=days.map((d,k)=>'<button type="button" role="tab"'+(DATA[d]&&DATA[d].pink?' class="pink" title="2반 '+esc(DATA[d].pink)+'"':'')+' aria-selected="'+(!ARC&&k===i)+'" data-i="'+k+'">'+lab(d)+'<small>'+(d===today?"오늘":d===SCH.find(x=>x>today)?"다음 등교일":DATA[d]?(!ARC&&k===i?"":"&nbsp;"):"쉼")+(!ARC&&k===i?'<i class="dd" aria-hidden="true">▾</i>':'')+'</small></button>'); // 고른 탭 날짜 옆 작은 ▾ = 누르면 달력 (D처럼, 11/25) · 날짜가 크게, 오늘·다음 등교일·쉼은 아래 작게 · 고른 탭엔 📅(누르면 달력)
   const W3=[i-1,i,i+1].map(k=>B[k]||'<span class="ph"></span>').join(""); // 고른 날을 늘 가운데 (첫날·끝날이면 빈 칸)
   T.innerHTML='<button type="button" class="nv" data-nv="-1" aria-label="이전 날짜"'+(i<=0&&!ARC?' disabled':'')+'>‹</button><div class="tw">'+W3+'</div><button type="button" class="nv" data-nv="1" aria-label="다음 날짜"'+(i>=days.length-1&&!ARC?' disabled':'')+'>›</button>';
-  T.querySelectorAll("button.nv").forEach(b=>b.onclick=()=>{if(ARC){ARC=false}else{i=Math.min(Math.max(0,i+ +b.dataset.nv),days.length-1)}tabs();show()});
-  T.querySelectorAll(".tw button").forEach(b=>b.onclick=()=>{if(!ARC&&+b.dataset.i===i)return calOpen();ARC=false;i=+b.dataset.i;tabs();show()}); // 이미 고른 탭을 또 누르면 달력
+  T.querySelectorAll("button.nv").forEach(b=>b.onclick=()=>{calClose();if(ARC){ARC=false}else{i=Math.min(Math.max(0,i+ +b.dataset.nv),days.length-1)}tabs();show()});
+  T.querySelectorAll(".tw button").forEach(b=>b.onclick=()=>{if(!ARC&&+b.dataset.i===i)return document.getElementById("calov")?calClose():calOpen();calClose();ARC=false;i=+b.dataset.i;tabs();show()}); // 이미 고른 탭을 또 누르면 달력
   const A=document.getElementById("arcbox");
   A.innerHTML='<button type="button" class="arcb'+(ARC?' on':'')+'">'+(ARC?'← 날짜 보기로 돌아가기':'🗂 지난 기록 보기 <small>'+(ARCH.length?ARCH.length+'일':GRADE.some(o=>o.ok)?'확인 공지':'아직 없음')+'</small>')+'</button>';
   A.querySelector("button").onclick=()=>{ARC=!ARC;tabs();show();window.scrollTo(0,0)}}
@@ -902,7 +902,7 @@ function extras(){ // 🔭 그 다음 학교 일정 = 지금 고른 날짜 탭 �
   if(G.length)h+='<details class="card tc tg" open><summary>📦 기간 할 일</summary>'+G.map(g=>'<h3>'+esc(gLabel(g.label))+'</h3>'+tItems(g.items)).join("")+'</details>';
   if(later.length)h+='<details class="card tc tg"><summary>🔭 그 다음 학교 일정</summary>'+later.map(x=>'<h3>'+esc(x.label)+'</h3>'+tItems(x.items)).join("")+'</details>';
   put("extra",h);
-  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v12';
+  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v13';
 }
 document.addEventListener("click",e=>{const b=e.target.closest(".lcp");if(!b)return;const u=b.dataset.url,ok=()=>{b.textContent="복사됨 ✓";setTimeout(()=>b.textContent="🔗 복사",1500)};
   const fb=()=>{const ta=document.createElement("textarea");ta.value=u;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();let k=false;try{k=document.execCommand("copy")}catch(x){}ta.remove();if(k)ok();else prompt("길게 눌러 복사하세요",u)};
