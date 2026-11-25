@@ -618,8 +618,9 @@ function tabs(){const T=document.getElementById("tabs");
   A.querySelector("button").onclick=()=>{ARC=!ARC;tabs();show();window.scrollTo(0,0)}}
 // ── 📅 달력: 고른 날짜 탭을 누르면 뜸 · 날짜 탭이 있는 날만 누를 수 있음 (11/25) ──
 let CALM=""; // 달력에 보이는 달 "YYYY-MM"
-function calOpen(){CALM=days[i].slice(0,7);calDraw()}
-function calClose(){const o=document.getElementById("calov");if(o)o.remove();document.removeEventListener("keydown",calKey)}
+function calArrow(on){const e=document.querySelector("#tabs [aria-selected=true] .dd");if(e)e.textContent=on?"▴":"▾"} // 열려 있으면 ▴(누르면 닫힘), 닫혀 있으면 ▾
+function calOpen(){CALM=days[i].slice(0,7);calDraw();calArrow(true)}
+function calClose(){const o=document.getElementById("calov");if(o)o.remove();calArrow(false);document.removeEventListener("keydown",calKey)}
 function calKey(e){if(e.key==="Escape")calClose()}
 function calDraw(){let o=document.getElementById("calov");
   if(!o){o=document.createElement("div");o.id="calov";o.className="calov";o.onclick=e=>{if(e.target===o)calClose()};document.body.appendChild(o);document.addEventListener("keydown",calKey)}
@@ -902,7 +903,7 @@ function extras(){ // 🔭 그 다음 학교 일정 = 지금 고른 날짜 탭 �
   if(G.length)h+='<details class="card tc tg" open><summary>📦 기간 할 일</summary>'+G.map(g=>'<h3>'+esc(gLabel(g.label))+'</h3>'+tItems(g.items)).join("")+'</details>';
   if(later.length)h+='<details class="card tc tg"><summary>🔭 그 다음 학교 일정</summary>'+later.map(x=>'<h3>'+esc(x.label)+'</h3>'+tItems(x.items)).join("")+'</details>';
   put("extra",h);
-  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v13';
+  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v14';
 }
 document.addEventListener("click",e=>{const b=e.target.closest(".lcp");if(!b)return;const u=b.dataset.url,ok=()=>{b.textContent="복사됨 ✓";setTimeout(()=>b.textContent="🔗 복사",1500)};
   const fb=()=>{const ta=document.createElement("textarea");ta.value=u;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();let k=false;try{k=document.execCommand("copy")}catch(x){}ta.remove();if(k)ok();else prompt("길게 눌러 복사하세요",u)};
