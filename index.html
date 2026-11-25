@@ -57,6 +57,22 @@ h1{font:700 1.5rem/1.2"Gowun Dodum","IBM Plex Sans KR",sans-serif;margin:4px 0 1
 .notice-card.pinkday{border-color:var(--pink)!important;background:var(--pink-soft)}
 .notice-card.pinkday .nh h2{color:var(--pink)}
 .pinkln{margin:0 0 8px;font-size:.85rem;font-weight:700;color:var(--pink)}
+/* 📅 고른 날짜 탭 누르면 뜨는 달력 (11/25) */
+.calov{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.35);display:flex;align-items:flex-start;justify-content:center;padding:84px 16px 16px}
+.calbx{width:100%;max-width:360px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:12px 12px 14px;box-shadow:0 12px 32px rgba(0,0,0,.25)}
+.calhd{display:flex;align-items:center;gap:6px;margin-bottom:8px}.calhd b{flex:1;text-align:center;font-size:1.05rem}
+.calhd button{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--acc);font:inherit;font-size:1.2rem;font-weight:800;cursor:pointer}
+.calhd button:disabled{opacity:.25;cursor:default}.calhd .calx{color:var(--mut);font-size:1rem}
+.calgr{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.calgr .wd{text-align:center;font-size:.75rem;color:var(--mut);padding:2px 0}.calgr .wd.su{color:var(--warn)}
+.calgr button{position:relative;aspect-ratio:1/1;min-height:38px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:700;cursor:pointer;padding:0}
+.calgr button:disabled{border-color:transparent;background:none;color:var(--mut);opacity:.4;font-weight:400;cursor:default}
+.calgr button.rest{color:var(--mut);font-weight:400;border-style:dashed}
+.calgr button.pink{border-color:var(--pink);background:var(--pink-soft);color:var(--pink)}
+.calgr button.td{box-shadow:inset 0 0 0 2px var(--acc)}
+.calgr button.sel{background:var(--acc);border-color:var(--acc);color:#fff}.calgr button.pink.sel{background:var(--pink);border-color:var(--pink)}
+.calgr button i{position:absolute;left:50%;bottom:4px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--acc)}.calgr button.sel i{background:#fff}.calgr button.pink i{background:var(--pink)}
+.calft{margin-top:10px;font-size:.75rem;color:var(--mut);line-height:1.5}
 .notice-card .nh{display:flex;align-items:center;gap:8px;margin:0 0 10px}
 .notice-card .nh h2{margin:0;font-size:1.2rem}
 .tk{font-size:16px;line-height:1.6;color:var(--tk-ink)}
@@ -587,14 +603,34 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 const lab=d=>{const t=new Date(d+"T12:00:00");return (t.getMonth()+1)+"/"+t.getDate()+" ("+W[t.getDay()]+")"};
 let TW=0; // 날짜 탭 창 시작 위치 (3개씩)
 function tabs(){const T=document.getElementById("tabs");
-  const B=days.map((d,k)=>'<button type="button" role="tab"'+(DATA[d]&&DATA[d].pink?' class="pink" title="2반 '+esc(DATA[d].pink)+'"':'')+' aria-selected="'+(!ARC&&k===i)+'" data-i="'+k+'">'+lab(d)+'<small>'+(d===today?"오늘":d===SCH.find(x=>x>today)?"다음 등교일":DATA[d]?"&nbsp;":"쉼")+'</small></button>'); // 날짜가 크게, 오늘·다음 등교일·쉼은 아래 작게
+  const B=days.map((d,k)=>'<button type="button" role="tab"'+(DATA[d]&&DATA[d].pink?' class="pink" title="2반 '+esc(DATA[d].pink)+'"':'')+' aria-selected="'+(!ARC&&k===i)+'" data-i="'+k+'">'+lab(d)+'<small>'+(d===today?"오늘":d===SCH.find(x=>x>today)?"다음 등교일":DATA[d]?(!ARC&&k===i?"":"&nbsp;"):"쉼")+(!ARC&&k===i?" 📅":"")+'</small></button>'); // 날짜가 크게, 오늘·다음 등교일·쉼은 아래 작게 · 고른 탭엔 📅(누르면 달력)
   const mx=Math.max(0,B.length-3);if(!ARC){if(i<TW)TW=i;if(i>TW+2)TW=i-2}TW=Math.min(Math.max(0,TW),mx);
   T.innerHTML='<button type="button" class="nv" data-nv="-1" aria-label="이전 날짜"'+(i<=0&&!ARC?' disabled':'')+'>‹</button><div class="tw">'+B.slice(TW,TW+3).join("")+'</div><button type="button" class="nv" data-nv="1" aria-label="다음 날짜"'+(i>=days.length-1&&!ARC?' disabled':'')+'>›</button>';
   T.querySelectorAll("button.nv").forEach(b=>b.onclick=()=>{if(ARC){ARC=false}else{i=Math.min(Math.max(0,i+ +b.dataset.nv),days.length-1)}tabs();show()});
-  T.querySelectorAll(".tw button").forEach(b=>b.onclick=()=>{ARC=false;i=+b.dataset.i;tabs();show()});
+  T.querySelectorAll(".tw button").forEach(b=>b.onclick=()=>{if(!ARC&&+b.dataset.i===i)return calOpen();ARC=false;i=+b.dataset.i;tabs();show()}); // 이미 고른 탭을 또 누르면 달력
   const A=document.getElementById("arcbox");
   A.innerHTML='<button type="button" class="arcb'+(ARC?' on':'')+'">'+(ARC?'← 날짜 보기로 돌아가기':'🗂 지난 기록 보기 <small>'+(ARCH.length?ARCH.length+'일':GRADE.some(o=>o.ok)?'확인 공지':'아직 없음')+'</small>')+'</button>';
   A.querySelector("button").onclick=()=>{ARC=!ARC;tabs();show();window.scrollTo(0,0)}}
+// ── 📅 달력: 고른 날짜 탭을 누르면 뜸 · 날짜 탭이 있는 날만 누를 수 있음 (11/25) ──
+let CALM=""; // 달력에 보이는 달 "YYYY-MM"
+function calOpen(){CALM=days[i].slice(0,7);calDraw()}
+function calClose(){const o=document.getElementById("calov");if(o)o.remove();document.removeEventListener("keydown",calKey)}
+function calKey(e){if(e.key==="Escape")calClose()}
+function calDraw(){let o=document.getElementById("calov");
+  if(!o){o=document.createElement("div");o.id="calov";o.className="calov";o.onclick=e=>{if(e.target===o)calClose()};document.body.appendChild(o);document.addEventListener("keydown",calKey)}
+  const y=+CALM.slice(0,4),m=+CALM.slice(5,7),first=new Date(y,m-1,1).getDay(),n=new Date(y,m,0).getDate(),p=v=>String(v).padStart(2,"0");
+  const lo=days[0].slice(0,7),hi=days[days.length-1].slice(0,7),idx=new Map(days.map((d,k)=>[d,k]));
+  let g='';for(const w of W)g+='<div class="wd'+(w==="일"?' su':'')+'">'+w+'</div>';
+  for(let k=0;k<first;k++)g+='<div></div>';
+  for(let dd=1;dd<=n;dd++){const d=y+"-"+p(m)+"-"+p(dd),k=idx.get(d),on=k!==undefined;
+    const has=on&&TD.some(x=>x.s<=d&&d<=x.e&&tLive(x.items).length);
+    const c=[on&&!DATA[d]?'rest':'',on&&DATA[d]&&DATA[d].pink?'pink':'',d===today?'td':'',on&&k===i?'sel':''].filter(Boolean).join(' ');
+    g+='<button type="button"'+(c?' class="'+c+'"':'')+(on?' data-k="'+k+'"':' disabled')+' aria-label="'+lab(d)+(DATA[d]?'':on?' 쉼':'')+'">'+dd+(has?'<i></i>':'')+'</button>'}
+  o.innerHTML='<div class="calbx" role="dialog" aria-label="날짜 고르기"><div class="calhd"><button type="button" data-mv="-1" aria-label="이전 달"'+(CALM<=lo?' disabled':'')+'>‹</button><b>'+y+'년 '+m+'월</b><button type="button" data-mv="1" aria-label="다음 달"'+(CALM>=hi?' disabled':'')+'>›</button><button type="button" class="calx" aria-label="닫기">✕</button></div>'
+    +'<div class="calgr">'+g+'</div><div class="calft">초록 테두리 = 오늘 · 분홍 = 2반 결석 많은 날 · 점선 = 쉬는 날 · 점 = 학교 일정 있음<br>흐린 날짜는 아직 공지가 없어서 못 골라요.</div></div>';
+  o.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{const t=new Date(y,m-1+ +b.dataset.mv,1);CALM=t.getFullYear()+"-"+p(t.getMonth()+1);calDraw()});
+  o.querySelector(".calx").onclick=calClose;
+  o.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{i=+b.dataset.k;calClose();tabs();show();window.scrollTo({top:0,behavior:"smooth"})})}
 // ── ✅ 현재원 체크 (반별, 날짜 탭마다) ──
 // 명렬표는 학생 이름이라 공개 코드에 없음: 비번(잠금 공지 비번과 같음)을 넣으면 Apps Script에서 받아 이 기기에 저장
 // 체크·빼기는 이 기기에만 날짜·반별로 저장 (localStorage "jck:날짜:반") · 2반은 D 출결대로 결석·조퇴 등이 자동으로 빠짐
@@ -860,7 +896,7 @@ function extras(){ // 🔭 그 다음 학교 일정 = 지금 고른 날짜 탭 �
   if(G.length)h+='<details class="card tc tg" open><summary>📦 기간 할 일</summary>'+G.map(g=>'<h3>'+esc(gLabel(g.label))+'</h3>'+tItems(g.items)).join("")+'</details>';
   if(later.length)h+='<details class="card tc tg"><summary>🔭 그 다음 학교 일정</summary>'+later.map(x=>'<h3>'+esc(x.label)+'</h3>'+tItems(x.items)).join("")+'</details>';
   put("extra",h);
-  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v8';
+  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v9';
 }
 document.addEventListener("click",e=>{const b=e.target.closest(".lcp");if(!b)return;const u=b.dataset.url,ok=()=>{b.textContent="복사됨 ✓";setTimeout(()=>b.textContent="🔗 복사",1500)};
   const fb=()=>{const ta=document.createElement("textarea");ta.value=u;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();let k=false;try{k=document.execCommand("copy")}catch(x){}ta.remove();if(k)ok();else prompt("길게 눌러 복사하세요",u)};
