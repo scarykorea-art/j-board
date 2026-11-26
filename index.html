@@ -35,7 +35,11 @@ h1{font:700 1.5rem/1.2"Gowun Dodum","IBM Plex Sans KR",sans-serif;margin:4px 0 1
 .tabs .tw button[aria-selected=false]{opacity:.45;transform:scale(.94)}
 .tabs .tw button[aria-selected=false]:hover{opacity:.75}
 .tabs .tw .ph{visibility:hidden}
-.tabs .tw .dd{font-style:normal;margin-left:2px;opacity:.7}
+/* 11/27: 달력 화살표가 안 보인다는 말 → 글자 크기 그대로, 동그란 칩 + 처음에 살짝 두 번 까딱 */
+.tabs .tw .dd{font-style:normal;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-left:5px;border-radius:50%;background:rgba(127,127,127,.25);background:color-mix(in srgb,currentColor 30%,transparent);font-size:12px;font-weight:900;line-height:1;vertical-align:-1px;animation:ddNudge 1.2s ease-in-out .6s 2}
+.tabs .tw button:hover .dd{background:color-mix(in srgb,currentColor 36%,transparent)}
+@keyframes ddNudge{0%,100%{transform:translateY(0)}40%{transform:translateY(2px)}}
+@media (prefers-reduced-motion:reduce){.tabs .tw .dd{animation:none}}
 .card,.tabs button{background:var(--card)}
 .tabs button{flex:0 0 auto;min-width:0;padding:6px 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-height:56px;border-radius:12px;border:2px solid var(--line);color:var(--ink);font:inherit;font-weight:700;cursor:pointer;line-height:1.25}
 .tabs button small{display:block;font-weight:400;font-size:.78rem;color:var(--mut)}
@@ -939,7 +943,7 @@ function extras(){ // 🔭 그 다음 학교 일정 = 지금 고른 날짜 탭 �
   if(G.length)h+='<details class="card tc tg" open><summary>📦 기간 할 일</summary>'+G.map(g=>'<h3>'+esc(gLabel(g.label))+'</h3>'+tItems(g.items)).join("")+'</details>';
   if(later.length)h+='<details class="card tc tg"><summary>🔭 그 다음 학교 일정</summary>'+later.map(x=>'<h3>'+esc(x.label)+'</h3>'+tItems(x.items)).join("")+'</details>';
   put("extra",h);
-  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v17';
+  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v18';
 }
 document.addEventListener("click",e=>{const b=e.target.closest(".lcp");if(!b)return;const u=b.dataset.url,ok=()=>{b.textContent="복사됨 ✓";setTimeout(()=>b.textContent="🔗 복사",1500)};
   const fb=()=>{const ta=document.createElement("textarea");ta.value=u;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();let k=false;try{k=document.execCommand("copy")}catch(x){}ta.remove();if(k)ok();else prompt("길게 눌러 복사하세요",u)};
