@@ -477,6 +477,16 @@ details.tg[open] summary::before{content:"▾ "}
 .gprev .gpl{display:flex;gap:6px;min-width:0}
 .gprev .gpl span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gprev .gpl b{flex:none;font-weight:600}
+/* 11/26: 접힌 공지 카드 = 아래 '공지 전체 펼치기 ▾'가 눈에 띄게 · 공지 안 '더보기'는 조용하게 */
+.card.qf.fold>.gprev:not(.fh){opacity:1}
+.gprev .gpl{opacity:.75}
+.gall{display:flex;justify-content:flex-end;margin-top:6px}
+.gall b{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:4px 14px;border-radius:999px;background:#7a3fb0;color:#fff;font-size:.82rem;font-weight:700;box-shadow:0 2px 6px rgba(122,63,176,.25)}
+.gall i{font-style:normal;font-size:1rem;line-height:1}
+.gall b:hover{filter:brightness(1.08)}
+.gsum b,.gtog{min-height:24px;padding:2px 4px;background:none!important;color:#7a3fb0!important;font-weight:600;font-size:.74rem;opacity:.7;border-radius:6px}
+.gsum:hover b,.gtog:hover{opacity:1;text-decoration:underline}
+@media (prefers-color-scheme:dark){.gall b{background:#c59af0;color:#1a1020}.gsum b,.gtog{color:#c59af0!important}}
 .qjbtn{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:60;border:0;border-radius:999px;padding:10px 16px;background:var(--acc,#1f6b4a);color:#fff;font:inherit;font-size:.88rem;font-weight:800;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.22)}
 .qjmenu{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:60;display:flex;flex-direction:column;min-width:190px;max-height:70vh;overflow:auto;padding:6px;border-radius:14px;background:var(--card,#fff);border:1.5px solid var(--line,#ddd);box-shadow:0 10px 28px rgba(0,0,0,.25)}
 .qjmenu[hidden]{display:none}
@@ -808,7 +818,7 @@ function gCard(d){const L=GRADE.filter(o=>o.k!=="memo"&&gShow(o,d)).sort(gSort);
   const P=L.find(o=>o.imp)||null,R=L.filter(o=>o!==P); // 11/26: 맨 위 ⭐중요 하나는 카드가 접혀도 그대로 보임 (자기 더보기는 그대로) · 나머지는 아래에 제목 3줄
   return '<div class="card gc'+(EDIT?' editing':'')+'" id="gc"><h2>📌 선생님 공지<span class="cnt2">'+(L.length?L.length+'개':'')+'</span></h2>'
     +L.map((o,k)=>gItem(o,"day",k,L.length,o===P)).join("")
-    +(R.length?'<div class="gprev" onclick="this.parentElement.querySelector(\'.fh\').click()">'+R.slice(0,3).map((o,k)=>'<div class="gpl"><span>· '+(o.imp?'⭐':'')+(o.lock?'🔒':'')+esc(String(o.t||'').replace(/\*\*|\{(btn|go)\}/g,'').replace(/\[([^\]]+)\]\([^)]*\)/g,'$1'))+'</span>'+(k===2&&R.length>3?'<b>외 '+(R.length-3)+'개</b>':'')+'</div>').join('')+'</div>':'')
+    +(R.length?'<div class="gprev" onclick="this.parentElement.querySelector(\'.fh\').click()">'+R.slice(0,3).map((o,k)=>'<div class="gpl"><span>· '+(o.imp?'⭐':'')+(o.lock?'🔒':'')+esc(String(o.t||'').replace(/\*\*|\{(btn|go)\}/g,'').replace(/\[([^\]]+)\]\([^)]*\)/g,'$1'))+'</span></div>').join('')+'<div class="gall"><b>'+(R.length>3?'외 '+(R.length-3)+'개 · ':'')+'공지 전체 펼치기 <i>▾</i></b></div></div>':'')
     +(EDIT?(L.length?'':'<div class="empty">이 날 선생님 공지 없음</div>')+'<button type="button" class="add" data-add="'+d+'">＋ 이 날부터 공지 추가</button>':'')+'</div>'}
 function mCard(){const L=GRADE.filter(o=>o.k==="memo"&&gShow(o,today)).sort(gSort);if(!L.length&&!EDIT)return "";
   return '<div class="card gc mc'+(EDIT?' editing':'')+'" id="mc"><h2>🗂 메모<span class="cnt2">비번·참고</span></h2>'
@@ -929,7 +939,7 @@ function extras(){ // 🔭 그 다음 학교 일정 = 지금 고른 날짜 탭 �
   if(G.length)h+='<details class="card tc tg" open><summary>📦 기간 할 일</summary>'+G.map(g=>'<h3>'+esc(gLabel(g.label))+'</h3>'+tItems(g.items)).join("")+'</details>';
   if(later.length)h+='<details class="card tc tg"><summary>🔭 그 다음 학교 일정</summary>'+later.map(x=>'<h3>'+esc(x.label)+'</h3>'+tItems(x.items)).join("")+'</details>';
   put("extra",h);
-  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v16';
+  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v17';
 }
 document.addEventListener("click",e=>{const b=e.target.closest(".lcp");if(!b)return;const u=b.dataset.url,ok=()=>{b.textContent="복사됨 ✓";setTimeout(()=>b.textContent="🔗 복사",1500)};
   const fb=()=>{const ta=document.createElement("textarea");ta.value=u;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();let k=false;try{k=document.execCommand("copy")}catch(x){}ta.remove();if(k)ok();else prompt("길게 눌러 복사하세요",u)};
