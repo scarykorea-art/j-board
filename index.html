@@ -299,9 +299,9 @@ details.tg[open] summary::before{content:"▾ "}
 .lb,.scr2-t{align-items:center}
 .scr2-t{display:flex;justify-content:center;font-weight:800;color:#3c4046;transition:opacity .2s}
 .lb{display:inline-flex;flex-wrap:wrap;gap:6px;margin:4px 0;white-space:normal}
-.gx a.lbtn,.lcp{min-height:40px;border-radius:10px;font-weight:700}
-.gx a.lbtn{display:inline-flex;align-items:center;padding:6px 14px;background:var(--acc);color:#fff;text-decoration:none}
-.gx a.lbtn.go{background:#5b4a1f}
+:is(.gx,.ti,.gt) a.lbtn,.lcp{min-height:40px;border-radius:10px;font-weight:700}
+:is(.gx,.ti,.gt) a.lbtn{display:inline-flex;align-items:center;padding:6px 14px;background:var(--acc);color:#fff;text-decoration:none}
+:is(.gx,.ti,.gt) a.lbtn.go{background:#5b4a1f}
 .lcp{padding:6px 12px;border:1px solid var(--acc);background:var(--card);color:var(--acc);font:inherit;font-size:.85rem;font-weight:700;cursor:pointer}
 .mc{border:1px solid var(--line)}
 .gsum b,.mc h2{color:var(--mut)}
@@ -444,7 +444,7 @@ details.tg[open] summary::before{content:"▾ "}
 .gc:not(.editing) .ga:empty{display:none}
 .gc .empty{font-size:.85rem}
 .lb{display:inline-flex;flex-wrap:nowrap;align-items:center;gap:5px;max-width:100%;margin:2px 0;white-space:nowrap;vertical-align:middle}
-.gx a.lbtn{display:inline-block;flex:0 1 auto;min-height:30px;line-height:22px;padding:4px 11px;border-radius:8px;font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+:is(.gx,.ti,.gt) a.lbtn{display:inline-block;flex:0 1 auto;min-height:30px;line-height:22px;padding:4px 11px;border-radius:8px;font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lcp{flex:none;min-height:30px;padding:2px 9px;border-radius:8px;font-size:.74rem}
 .ti{padding:7px 2px;font-size:.93rem;line-height:1.45}
 /* 11/25: 오늘 학교 일정·할 일 줄을 선생님 공지 줄(.gsum)과 같은 규격으로 (글자 .88rem · 줄높이 1.6 · 위아래 여백 작게) */
@@ -720,7 +720,21 @@ function show(){
   if(!sameM||!sameO){gBind(d);scrInit()}
 }
 // ── 선생님 할 일 (A에서 학교 일만 골라온 것) ──
-function tFmt(s){return esc(s).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\{btn\}\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<span class="lb"><a class="lbtn" href="$2" target="_blank" rel="noopener">$1 ↗</a><button type="button" class="lcp" data-url="$2">🔗 복사</button></span>').replace(/\{go\}\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<span class="lb"><a class="lbtn go" href="$2" target="_blank" rel="noopener">$1 ↗</a></span>').replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')}
+// 11/26: 붙여 넣은 주소를 작은 버튼으로 — [네이버지도]/[카카오맵] 공유 글 → 📍 장소 버튼 · 그냥 [글](주소) → 버튼 · 맨 주소 → 종류별 이름 버튼
+function lnLab(u){const h=(u.match(/^https?:\/\/([^\/?#]+)/i)||["",""])[1].replace(/^www\./i,"").toLowerCase();
+  if(/^(map\.naver\.com|naver\.me|kko\.to|map\.kakao\.com|place\.map\.kakao\.com|maps\.app\.goo\.gl|goo\.gl\/maps)/.test(h)||/google\.[a-z.]+\/maps/.test(u))return h==="naver.me"?"🔗 네이버":"📍 지도";
+  if(h==="forms.gle"||/docs\.google\.com\/forms/.test(u))return "📝 설문";
+  if(/docs\.google\.com\/spreadsheets/.test(u))return "📊 시트";
+  if(/docs\.google\.com\/presentation/.test(u))return "📽 슬라이드";
+  if(/^(docs|drive)\.google\.com$/.test(h))return "📄 문서";
+  if(/^(youtu\.be|youtube\.com|m\.youtube\.com)$/.test(h))return "▶ 영상";
+  if(/^(padlet\.com|padlet\.link)$/.test(h))return "🧱 패들렛";
+  return "🔗 "+h}
+function lnNorm(s){return String(s||"")
+  .replace(/\[(?:네이버\s?지도|카카오\s?맵)\][ \t]*\n?[ \t]*([^\n\[\]]+?)[ \t]*\n(?:[ \t]*([^\n]+?)[ \t]*\n)?[ \t]*(https?:\/\/[^\s<>()\[\]]+)/g,(m,n,a,u)=>/^https?:/.test(a||"")?m:"{go}[📍 "+n+"]("+u+")"+(a?" "+a:""))
+  .replace(/(^|[^}])\[([^\]\n]+)\]\((https?:\/\/[^)\s]+)\)/g,"$1{go}[$2]($3)")
+  .replace(/(^|[\s:：·,])(https?:\/\/[^\s<>()\[\]]+)/g,(m,p,u)=>{u=u.replace(/[.,;!?。]+$/,"");const t=m.slice(p.length+u.length);return p+"{go}["+lnLab(u)+"]("+u+")"+t})}
+function tFmt(s){return esc(lnNorm(s)).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\{btn\}\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<span class="lb"><a class="lbtn" href="$2" target="_blank" rel="noopener">$1 ↗</a><button type="button" class="lcp" data-url="$2">🔗 복사</button></span>').replace(/\{go\}\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<span class="lb"><a class="lbtn go" href="$2" target="_blank" rel="noopener">$1 ↗</a></span>').replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')}
 function tLive(list){if(EDIT)return list;const out=[];let skip=false;for(const o of list){const sub=+o.l>0;if(!sub)skip=!!(o.id&&DONE.has(o.id));if(skip||(sub&&o.id&&DONE.has(o.id)))continue;out.push(o)}return out} // 완료한 일(+하위)은 숨김 · 편집 모드에선 줄 그어 보임
 function tItems(list,tagOf,noCk){let n=0;return tLive(list).map(o=>{const sub=+o.l>0;if(!sub)n++;const urg=!sub&&/🚨/.test(o.t),dn=!!(o.id&&DONE.has(o.id));
   const ck=EDIT&&!noCk&&o.id?'<button type="button" class="tdk" data-id="'+esc(o.id)+'" data-t="'+esc(o.t)+'" aria-pressed="'+dn+'" aria-label="'+(dn?"완료 취소":"완료")+'"></button>':'';
@@ -743,15 +757,15 @@ function gSort(a,b){if(a.imp!==b.imp)return a.imp?-1:1;const x=a.dl||"9",y=b.dl|
 function dBadge(o){if(!o.dl)return "";const n=dDiff(today,o.dl);
   const t=n>0?"D-"+n:n===0?"오늘 마감":"마감 지남";return '<span class="bd'+(n<=3?' hot':'')+(n<0?' over':'')+'">⏰ '+lab(o.dl)+' · '+t+'</span>'}
 function gBody(o){ // 내용에 "---" 줄이 있으면 그 위(핵심)는 항상 보이고 아래만 접힘 / 없으면 한 줄 요약 + 링크 줄
-  const L=String(o.x).split("\n"),cut=L.findIndex(l=>/^\s*-{3,}\s*$/.test(l));
+  const L=lnNorm(o.x).split("\n"),cut=L.findIndex(l=>/^\s*-{3,}\s*$/.test(l));
   const full='<div class="gx'+(REV.has(o.id)?' reveal':'')+'">'+tFmt(L.filter((l,k)=>k!==cut).join("\n"))+'</div>';
   const tog=(op,pv)=>'<button type="button" class="'+(op?'gtog':'gsum')+'" data-tog="'+esc(o.id)+'" aria-expanded="'+op+'">'+(op?'접기 ▴':'<span class="pv">'+esc(pv||'')+'</span><b>더보기 ▾</b>')+'</button>';
   if(cut>=0){const rest=L.slice(cut+1).join("\n").trim();if(!rest)return full;
     if(OPEN.has(o.id))return full+tog(true);
-    const pv=L.slice(cut+1).map(l=>l.replace(/^\s*(?:[-•▶▼*]+|\d+\.)\s*/,"").replace(/\*\*(.+?)\*\*/g,"$1").replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,"$1").trim()).filter(Boolean).join(" · ");
+    const pv=L.slice(cut+1).map(l=>l.replace(/^\s*(?:[-•▶▼*]+|\d+\.)\s*/,"").replace(/\*\*(.+?)\*\*/g,"$1").replace(/\{(?:btn|go)\}/g,"").replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,"$1").trim()).filter(Boolean).join(" · ");
     return '<div class="gx">'+tFmt(L.slice(0,cut).join("\n").replace(/\s+$/,""))+'</div>'+tog(false,pv)}
   const isL=l=>/\{(btn|go)\}\[|\]\(https?:\/\//.test(l),links=L.filter(isL),rest=L.filter(l=>!isL(l)&&l.trim());
-  const sum=rest.length?rest[0].replace(/^\s*[-•]\s*/,"").replace(/\*\*(.+?)\*\*/g,"$1").replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,"$1").trim():"";
+  const sum=rest.length?rest[0].replace(/^\s*[-•]\s*/,"").replace(/\*\*(.+?)\*\*/g,"$1").replace(/\{(?:btn|go)\}/g,"").replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,"$1").trim():"";
   const more=rest.length>1||sum.length>36;
   if(!more)return full;
   if(OPEN.has(o.id))return full+tog(true);
@@ -903,7 +917,7 @@ function extras(){ // 🔭 그 다음 학교 일정 = 지금 고른 날짜 탭 �
   if(G.length)h+='<details class="card tc tg" open><summary>📦 기간 할 일</summary>'+G.map(g=>'<h3>'+esc(gLabel(g.label))+'</h3>'+tItems(g.items)).join("")+'</details>';
   if(later.length)h+='<details class="card tc tg"><summary>🔭 그 다음 학교 일정</summary>'+later.map(x=>'<h3>'+esc(x.label)+'</h3>'+tItems(x.items)).join("")+'</details>';
   put("extra",h);
-  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v14';
+  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v15';
 }
 document.addEventListener("click",e=>{const b=e.target.closest(".lcp");if(!b)return;const u=b.dataset.url,ok=()=>{b.textContent="복사됨 ✓";setTimeout(()=>b.textContent="🔗 복사",1500)};
   const fb=()=>{const ta=document.createElement("textarea");ta.value=u;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();let k=false;try{k=document.execCommand("copy")}catch(x){}ta.remove();if(k)ok();else prompt("길게 눌러 복사하세요",u)};
