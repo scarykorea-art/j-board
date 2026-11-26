@@ -467,6 +467,9 @@ details.tg[open] summary::before{content:"▾ "}
 .card.qf.fold>.fh h2::before,.card.qf.fold>h2.fh::before{content:"▸ "}
 .card.qf.fold>:not(.fh){display:none!important}
 .card.qf.fold>.fh,.card.qf.fold>h2.fh{margin-bottom:0}
+.card.qf.fold>.gi.pin1{display:block!important;margin-top:8px} /* 11/26: 접혀도 맨 위 중요 공지 하나는 보임 */
+.gi .mini.mv{min-width:0;padding-left:8px;padding-right:8px}
+.gi .mini.mv:disabled{opacity:.35}
 .card.qf.fold>.fh h2{margin-bottom:0}
 /* 선생님 공지: 접혀 있을 때 제목 아래 최대 3줄(한 줄에 공지 하나)로 공지 제목만 흐리게 미리보기 */
 .gprev{display:none}
@@ -753,7 +756,8 @@ const gOver=o=>o.e<today&&!o.ok; // 게시 기간 지났는데 아직 ✓ 확인
 const gShow=(o,d)=>gLive(o,d)||(d===today&&gOver(o));
 const gStat=o=>o.e<today?"done":o.s>today?"wait":"live";
 const endLab=e=>e>=FOREVER?"계속":lab(e);
-function gSort(a,b){if(a.imp!==b.imp)return a.imp?-1:1;const x=a.dl||"9",y=b.dl||"9";if(x!==y)return x<y?-1:1;return a.s<b.s?-1:a.s>b.s?1:0}
+const gRank=o=>o.n>0?o.n:o.imp?-1e6:1e6; // 11/26: 편집 모드 ↑↓로 정한 순서(n) · 순서 없는 새 공지는 중요면 맨 위, 아니면 맨 아래
+function gSort(a,b){const ra=gRank(a),rb=gRank(b);if(ra!==rb)return ra-rb;if(a.imp!==b.imp)return a.imp?-1:1;const x=a.dl||"9",y=b.dl||"9";if(x!==y)return x<y?-1:1;return a.s<b.s?-1:a.s>b.s?1:0}
 function dBadge(o){if(!o.dl)return "";const n=dDiff(today,o.dl);
   const t=n>0?"D-"+n:n===0?"오늘 마감":"마감 지남";return '<span class="bd'+(n<=3?' hot':'')+(n<0?' over':'')+'">⏰ '+lab(o.dl)+' · '+t+'</span>'}
 function gBody(o){ // 내용에 "---" 줄이 있으면 그 위(핵심)는 항상 보이고 아래만 접힘 / 없으면 한 줄 요약 + 링크 줄
@@ -782,12 +786,13 @@ function scrInit(){ // 🔒 잠금: 진짜로 긁는 은박 (밑엔 내용 없�
     cv.onpointermove=e=>{if(!down)return;const p=pt(e);x.beginPath();x.moveTo(lx,ly);x.lineTo(p[0],p[1]);x.stroke();mv+=Math.hypot(p[0]-lx,p[1]-ly);lx=p[0];ly=p[1]};
     cv.onpointerup=cv.onpointercancel=()=>{if(!down)return;down=false;if(mv>150)setTimeout(()=>gUnlock(el),250);else if(mv<8)hint.style.opacity=1};
     el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();gUnlock(el)}}})}
-function gItem(o,mode){ // mode: "day" | "memo" | "mgr"
+function gItem(o,mode,k,len,pin){ // mode: "day" | "memo" | "mgr" · k·len = 선생님 공지 카드 안 위치 (↑↓) · pin = 접혀도 보이는 맨 위 중요 공지
   const st=gStat(o),isM=o.k==="memo";
   const meta=[];if(o.lock)meta.push('<span class="bd lk">🔒 잠금</span>');if(o.imp)meta.push('<span class="bd imp">⭐ 중요</span>');const db=dBadge(o);if(db)meta.push(db);
   if(EDIT||mode==="mgr")meta.push('<span class="bd per">'+(isM?"🗂 메모":"📌 공지")+' · 게시 '+lab(o.s)+' ~ '+endLab(o.e)+(st==="done"?" (끝남)":st==="wait"?" (예정)":"")+'</span>');
   const ov=mode!=="mgr"&&gOver(o);if(ov)meta.unshift('<span class="bd ovd">⏰ 게시 기간 지남'+(EDIT?'':' · 확인 대기')+'</span>');
   const act=[];if(EDIT&&gOver(o))act.push('<button type="button" class="mini okb" data-ok="'+esc(o.id)+'">✓ 확인 (기록으로)</button>');
+  if(EDIT&&mode==="day"&&len>1){act.push('<button type="button" class="mini mv" data-mv="'+esc(o.id)+'" data-dir="-1"'+(k>0?'':' disabled')+' aria-label="위로">▲ 위로</button>');act.push('<button type="button" class="mini mv" data-mv="'+esc(o.id)+'" data-dir="1"'+(k<len-1?'':' disabled')+' aria-label="아래로">▼ 아래로</button>')}
   if(EDIT){act.push('<button type="button" class="mini" data-ed="'+esc(o.id)+'">✏️ 수정</button>');
     act.push('<button type="button" class="mini" data-kind="'+esc(o.id)+'">'+(isM?"📌 공지로":"🗂 메모로")+'</button>');
     act.push('<button type="button" class="mini" data-imp="'+esc(o.id)+'">'+(o.imp?"☆ 중요 해제":"⭐ 중요")+'</button>');
@@ -795,14 +800,15 @@ function gItem(o,mode){ // mode: "day" | "memo" | "mgr"
     else act.push('<button type="button" class="mini" data-stop="'+esc(o.id)+'">⏹ 게시 끝내기</button>');
     act.push('<button type="button" class="mini" data-dup="'+esc(o.id)+'">⧉ 복제</button>');
     act.push('<button type="button" class="mini del" data-del="'+esc(o.id)+'">삭제</button>')}
-  return '<div class="gi'+(o.imp?' imp':'')+(st==="done"&&!ov?' over':'')+(ov?' ovr':'')+'" data-id="'+esc(o.id)+'">'+(o.t?'<div class="gt">'+tFmt(o.t)+'</div>':'')+(meta.length?'<div class="gm">'+meta.join("")+'</div>':'')
+  return '<div class="gi'+(o.imp?' imp':'')+(pin?' pin1':'')+(st==="done"&&!ov?' over':'')+(ov?' ovr':'')+'" data-id="'+esc(o.id)+'">'+(o.t?'<div class="gt">'+tFmt(o.t)+'</div>':'')+(meta.length?'<div class="gm">'+meta.join("")+'</div>':'')
     +(o.locked&&mode!=="mgr"?'<div class="lkbox"><div class="scr2" data-scr="1" tabindex="0" role="button" aria-label="긁어서 확인하기 (비번 필요)"><div class="scr2-u">🔑 비번을 넣어야 보여요</div><canvas></canvas><span class="scr2-t">🪙 마우스·손가락으로 긁어보세요</span></div></div>':'')
     +(o.x&&mode!=="mgr"?gBody(o):'')
     +(o.at&&EDIT&&mode!=="mgr"?'<div class="gat">'+esc(o.at)+' 수정</div>':'')+'<div class="ga">'+act.join("")+'</div></div>'}
 function gCard(d){const L=GRADE.filter(o=>o.k!=="memo"&&gShow(o,d)).sort(gSort);if(!L.length&&!EDIT)return "";
+  const P=L.find(o=>o.imp)||null,R=L.filter(o=>o!==P); // 11/26: 맨 위 ⭐중요 하나는 카드가 접혀도 그대로 보임 (자기 더보기는 그대로) · 나머지는 아래에 제목 3줄
   return '<div class="card gc'+(EDIT?' editing':'')+'" id="gc"><h2>📌 선생님 공지<span class="cnt2">'+(L.length?L.length+'개':'')+'</span></h2>'
-    +(L.length?'<div class="gprev" onclick="this.previousElementSibling.click()">'+L.slice(0,3).map((o,k)=>'<div class="gpl"><span>· '+(o.imp?'⭐':'')+(o.lock?'🔒':'')+esc(String(o.t||'').replace(/\*\*|\{(btn|go)\}/g,'').replace(/\[([^\]]+)\]\([^)]*\)/g,'$1'))+'</span>'+(k===2&&L.length>3?'<b>외 '+(L.length-3)+'개</b>':'')+'</div>').join('')+'</div>':'')
-    +L.map(o=>gItem(o,"day")).join("")
+    +L.map((o,k)=>gItem(o,"day",k,L.length,o===P)).join("")
+    +(R.length?'<div class="gprev" onclick="this.parentElement.querySelector(\'.fh\').click()">'+R.slice(0,3).map((o,k)=>'<div class="gpl"><span>· '+(o.imp?'⭐':'')+(o.lock?'🔒':'')+esc(String(o.t||'').replace(/\*\*|\{(btn|go)\}/g,'').replace(/\[([^\]]+)\]\([^)]*\)/g,'$1'))+'</span>'+(k===2&&R.length>3?'<b>외 '+(R.length-3)+'개</b>':'')+'</div>').join('')+'</div>':'')
     +(EDIT?(L.length?'':'<div class="empty">이 날 선생님 공지 없음</div>')+'<button type="button" class="add" data-add="'+d+'">＋ 이 날부터 공지 추가</button>':'')+'</div>'}
 function mCard(){const L=GRADE.filter(o=>o.k==="memo"&&gShow(o,today)).sort(gSort);if(!L.length&&!EDIT)return "";
   return '<div class="card gc mc'+(EDIT?' editing':'')+'" id="mc"><h2>🗂 메모<span class="cnt2">비번·참고</span></h2>'
@@ -818,6 +824,11 @@ function gMgr(){ // 편집 모드 전용: 전체 공지·메모 관리 (끝난 �
 const gv=id=>document.getElementById(id).value.trim();
 function gCall(fn,arg,m){google.script.run.withSuccessHandler(r=>{if(Array.isArray(r))GRADE=r;show()})
   .withFailureHandler(er=>{const t=(er&&er.message)||"저장 못 했어요";if(/비밀번호/.test(t)&&!/EDIT_PIN/.test(t)){PIN="";try{sessionStorage.removeItem("gpin")}catch(e){}}if(m)m.textContent=t;else alert(t)})[fn](PIN,arg)}
+function gMove(id,dir,d){ // 편집 모드 ▲▼: 이 날 보이는 바로 위/아래 공지와 자리 바꿈 → 전체 공지 순서를 1,2,3…으로 저장
+  const vis=GRADE.filter(o=>o.k!=="memo"&&gShow(o,d)).sort(gSort),k=vis.findIndex(o=>o.id===id),nb=vis[k+dir];if(k<0||!nb)return;
+  const all=GRADE.filter(o=>o.k!=="memo").sort(gSort),me=all.find(o=>o.id===id);all.splice(all.indexOf(me),1);
+  all.splice(all.indexOf(nb)+(dir>0?1:0),0,me);all.forEach((o,i)=>o.n=i+1);show(); // 먼저 화면에서 옮기고 저장
+  gCall("gradeOrder",all.map(o=>o.id),null)}
 const gPatch=(o,p)=>gCall("gradeSave",Object.assign({},o,p),null);
 function gForm(el,d,o){o=Object.assign({id:"",k:"",imp:false,s:d,e:d,dl:"",t:"",x:""},o||{});
   const f=document.createElement("div");f.className="gf";
@@ -863,6 +874,7 @@ function gBind(d){const find=id=>GRADE.find(x=>x.id===id);
   gc.querySelectorAll("[data-dup]").forEach(b=>b.onclick=()=>{const o=find(b.dataset.dup);if(o)gForm(b.closest(".gi"),d,Object.assign({},o,{id:"",t:o.t+" (복사)"}))});
   gc.querySelectorAll("[data-kind]").forEach(b=>b.onclick=()=>{const o=find(b.dataset.kind);if(!o)return;b.disabled=true;
     gPatch(o,o.k==="memo"?{k:"",e:o.e>=FOREVER?(o.dl||tAdd(today,7)):o.e,s:o.s>today?o.s:today}:{k:"memo"})});
+  gc.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>gMove(b.dataset.mv,+b.dataset.dir,d));
   gc.querySelectorAll("[data-imp]").forEach(b=>b.onclick=()=>{const o=find(b.dataset.imp);if(o){b.disabled=true;gPatch(o,{imp:!o.imp})}});
   gc.querySelectorAll("[data-ext]").forEach(b=>b.onclick=()=>{const o=find(b.dataset.ext);if(o){b.disabled=true;gPatch(o,{s:o.s>today?o.s:today,e:tAdd(today,7)})}});
   gc.querySelectorAll("[data-stop]").forEach(b=>b.onclick=()=>{const o=find(b.dataset.stop);if(!o)return;
@@ -917,7 +929,7 @@ function extras(){ // 🔭 그 다음 학교 일정 = 지금 고른 날짜 탭 �
   if(G.length)h+='<details class="card tc tg" open><summary>📦 기간 할 일</summary>'+G.map(g=>'<h3>'+esc(gLabel(g.label))+'</h3>'+tItems(g.items)).join("")+'</details>';
   if(later.length)h+='<details class="card tc tg"><summary>🔭 그 다음 학교 일정</summary>'+later.map(x=>'<h3>'+esc(x.label)+'</h3>'+tItems(x.items)).join("")+'</details>';
   put("extra",h);
-  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v15';
+  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v16';
 }
 document.addEventListener("click",e=>{const b=e.target.closest(".lcp");if(!b)return;const u=b.dataset.url,ok=()=>{b.textContent="복사됨 ✓";setTimeout(()=>b.textContent="🔗 복사",1500)};
   const fb=()=>{const ta=document.createElement("textarea");ta.value=u;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();let k=false;try{k=document.execCommand("copy")}catch(x){}ta.remove();if(k)ok();else prompt("길게 눌러 복사하세요",u)};
