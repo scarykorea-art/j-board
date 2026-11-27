@@ -183,6 +183,7 @@ span.tk-ck{cursor:default}
 .tg h3,.ti.sub{font-size:.92rem;color:var(--mut)}
 .ti.sub,.ti.urg{padding:4px 2px 4px 2.2em;border-top:0}
 .ti.urg{background:#fdeceb;border-radius:10px;padding:9px 10px;margin:4px 0}
+.ti .mdn{display:inline-block;margin-left:6px;font-size:.66rem;font-weight:600;color:var(--mut);opacity:.55;white-space:nowrap;vertical-align:1px} /* 11/27: A에서 형이 완료한 🏫 줄 = 아주 흐린 꼬리표만 (J에선 안 사라짐) */
 .ti .tag{display:inline-block;font-size:.72rem;font-weight:700;color:var(--mut);border:1px solid var(--line);border-radius:999px;padding:0 7px;margin-left:6px;vertical-align:1px}
 .ti a{color:var(--acc)}
 .tg h3{margin:12px 0 4px}
@@ -601,7 +602,6 @@ const W="일월화수목금토";
 let i=0;
 const ARCH=Array.isArray(RAW.archive)?RAW.archive:[];let ARC=false; // 🗂 지난 기록
 let DONE=new Set(Array.isArray(RAW.done)?RAW.done:[]); // ✓ 완료한 학교 일 (편집 모드에서 체크)
-[...(TEACH.days||[]),...(TEACH.groups||[])].forEach(x=>(x.items||[]).forEach(o=>{if(o.dn&&o.id)DONE.add(o.id)})); // 11/27: A에서 ✓완료한 🏫 줄(dn)도 J에서 완료로 (전엔 안 끝난 줄처럼 다시 떴음)
 const nowHM=()=>new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Seoul",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date());
 function tkNowDot(root,selSec){ // 오늘 일정: 지금 시각 위치에 반짝이는 점 (시각 사이는 비율대로 이동)
   const sec=root&&root.querySelector(selSec||".notice-card .tk-sec");if(!sec)return;
@@ -756,7 +756,7 @@ function tFmt(s){return esc(lnNorm(s)).replace(/\*\*(.+?)\*\*/g,"<strong>$1</str
 function tLive(list){if(EDIT)return list;const out=[];let skip=false;for(const o of list){const sub=+o.l>0;if(!sub)skip=!!(o.id&&DONE.has(o.id));if(skip||(sub&&o.id&&DONE.has(o.id)))continue;out.push(o)}return out} // 완료한 일(+하위)은 숨김 · 편집 모드에선 줄 그어 보임
 function tItems(list,tagOf,noCk){let n=0;return tLive(list).map(o=>{const sub=+o.l>0;if(!sub)n++;const urg=!sub&&/🚨/.test(o.t),dn=!!(o.id&&DONE.has(o.id));
   const ck=EDIT&&!noCk&&o.id?'<button type="button" class="tdk" data-id="'+esc(o.id)+'" data-t="'+esc(o.t)+'" aria-pressed="'+dn+'" aria-label="'+(dn?"완료 취소":"완료")+'"></button>':'';
-  return '<div class="ti'+(sub?' sub':'')+(urg?' urg':'')+(dn?' dn':'')+'">'+ck+(sub?'':'<span class="n">'+n+'</span>')+'<span>'+(sub?'↳ ':'')+tFmt(o.t)+(o.tag?'<span class="tag">'+esc(o.tag)+'</span>':'')+'</span></div>'}).join("")}
+  return '<div class="ti'+(sub?' sub':'')+(urg?' urg':'')+(dn?' dn':'')+'">'+ck+(sub?'':'<span class="n">'+n+'</span>')+'<span>'+(sub?'↳ ':'')+tFmt(o.t)+(o.tag?'<span class="tag">'+esc(o.tag)+'</span>':'')+(o.dn?'<span class="mdn" title="2반 담임이 개인적으로 완료 (모두의 할 일은 그대로)">✓ 2반 완료</span>':'')+'</span></div>'}).join("")}
 document.addEventListener("click",e=>{const b=e.target.closest(".tdk");if(!b||!EDIT)return; // ✓ 완료 체크 → 시트 "완료" 탭 → A 열면 A에서도 완료
   const id=b.dataset.id,on=!DONE.has(id);on?DONE.add(id):DONE.delete(id);extras();show();
   google.script.run.withSuccessHandler(r=>{if(Array.isArray(r)){DONE=new Set(r);extras();show()}})
@@ -944,7 +944,7 @@ function extras(){ // 🔭 그 다음 학교 일정 = 지금 고른 날짜 탭 �
   if(G.length)h+='<details class="card tc tg" open><summary>📦 기간 할 일</summary>'+G.map(g=>'<h3>'+esc(gLabel(g.label))+'</h3>'+tItems(g.items)).join("")+'</details>';
   if(later.length)h+='<details class="card tc tg"><summary>🔭 그 다음 학교 일정</summary>'+later.map(x=>'<h3>'+esc(x.label)+'</h3>'+tItems(x.items)).join("")+'</details>';
   put("extra",h);
-  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v19';
+  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v20';
 }
 document.addEventListener("click",e=>{const b=e.target.closest(".lcp");if(!b)return;const u=b.dataset.url,ok=()=>{b.textContent="복사됨 ✓";setTimeout(()=>b.textContent="🔗 복사",1500)};
   const fb=()=>{const ta=document.createElement("textarea");ta.value=u;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();let k=false;try{k=document.execCommand("copy")}catch(x){}ta.remove();if(k)ok();else prompt("길게 눌러 복사하세요",u)};
