@@ -920,14 +920,21 @@ function gLabel(lb){const m=lb.match(/^(다음주|이번주|지난주)\((\d+)\/(
   const y=+today.slice(0,4),p=n=>String(n).padStart(2,"0"),s=y+"-"+p(m[2])+"-"+p(m[3]),e=(+m[4]<+m[2]?y+1:y)+"-"+p(m[4])+"-"+p(m[5]);
   return (today<s?"다음주":today>e?"지난주":"이번주")+"("+m[2]+"/"+m[3]+"~"+m[4]+"/"+m[5]+")"+m[6]}
 function archHTML(){ // 🗂 지난 기록: 날짜별로 그날 보이던 3학년 공지·학교 일정·아이들 공지
-  let h='<h2 class="ah">🗂 지난 기록</h2><p class="asub">날짜가 지나면 그날 내용이 여기로 넘어와요. 최근 날짜가 맨 위.</p>';
+  let h='<h2 class="ah">🗂 지난 기록</h2><p class="asub">날짜가 지나면 그날 내용이 여기로 넘어와요. 최근 날짜가 맨 위. 선생님 공지는 게시가 끝난 것만, 마지막 날에 한 번 보여요.</p>';
   const OK=GRADE.filter(o=>o.ok).sort((a,b)=>a.ok<b.ok?1:a.ok>b.ok?-1:0);
   if(OK.length)h+='<details class="card ad" open><summary>✅ 확인 끝난 선생님 공지<span class="cnt2">'+OK.length+'개</span></summary><div class="ab">'
     +OK.map(o=>'<div class="gi"><div class="gt">'+(o.k==="memo"?'🗂 ':'')+(o.imp?'⭐ ':'')+(o.lock?'🔒 ':'')+tFmt(o.t||'')+'</div><div class="gr">게시 '+lab(o.s)+' ~ '+endLab(o.e)+' · '+esc(o.ok)+' 확인</div>'+(o.x&&!o.locked?'<div class="gx">'+tFmt(o.x)+'</div>':'')+(EDIT?'<div class="ga"><button type="button" class="mini" data-unok="'+esc(o.id)+'">↩ 확인 취소</button></div>':'')+'</div>').join('')+'</div></details>';
   if(!ARCH.length)return h+(OK.length?'':'<div class="card empty">아직 보관된 날이 없어요. 오늘 내용은 내일부터 여기 보여요.</div>');
   let mon="";
+  // 11/27: 지난 기록의 선생님 공지 = 게시 내린 것만, 마지막으로 걸려 있던 날에 한 번만 (지금 게시 중·예정·확인 대기인 공지는 안 보임)
+  const gk=t=>String(t||"").replace(/\*\*|\{(btn|go)\}/g,"").replace(/\s+/g," ").trim();
+  const big=s=>{const z=s.replace(/\s/g,""),m=new Map();for(let i=0;i<z.length-1;i++){const b=z.slice(i,i+2);m.set(b,(m.get(b)||0)+1)}return [m,Math.max(1,z.length-1)]};
+  const sim=(x,y)=>{if(x===y)return 1;const [A,na]=big(x),[B,nb]=big(y);let c=0;A.forEach((v,k)=>{c+=Math.min(v,B.get(k)||0)});return 2*c/(na+nb)};
+  const same=(o,p)=>(o.id&&p.id)?o.id===p.id:sim(gk(o.t),gk(p.t))>=0.6; // 제목을 고친 공지도 같은 공지로 (옛 기록엔 id가 없어서 글자 비슷한 걸로)
+  const LIVE=GRADE.filter(o=>o.k!=="memo"&&!o.ok&&(gStat(o)!=="done"||gOver(o)));
+  const SEEN=[]; // ARCH는 최근 날짜가 먼저 → 처음 만난 날 = 마지막 게시일
   ARCH.forEach((a,k)=>{const mm=+a.d.slice(5,7);if(mm+""!==mon){mon=mm+"";h+='<div class="amon">'+mm+'월</div>'}
-    const G=a.g||[],T=a.t||[],top=T.filter(o=>!(+o.l>0)).length;
+    const G=(a.g||[]).filter(o=>{if(!gk(o.t)||LIVE.some(p=>same(o,p))||SEEN.some(p=>same(o,p)))return false;SEEN.push(o);return true}),T=a.t||[],top=T.filter(o=>!(+o.l>0)).length;
     const cnt=[G.length?'선생님 공지 '+G.length:'',top?'할 일 '+top:'',a.n?'아이들 공지':''].filter(Boolean).join(' · ');
     h+='<details class="card ad"'+(k===0?' open':'')+'><summary>'+lab(a.d)+'<span class="cnt2">'+esc(cnt)+'</span></summary><div class="ab">';
     if(G.length)h+='<h3>📌 선생님 공지</h3>'+G.map(o=>'<div class="gi"><div class="gt">'+(o.imp?'⭐ ':'')+(o.lock?'🔒 ':'')+esc(o.t||'')+'</div>'+(o.lock?'<div class="gr">잠금 공지라 내용은 보관 안 함</div>':o.x?'<div class="gx">'+tFmt(o.x)+'</div>':'')+'</div>').join('');
@@ -944,7 +951,7 @@ function extras(){ // 🔭 그 다음 학교 일정 = 지금 고른 날짜 탭 �
   if(G.length)h+='<details class="card tc tg" open><summary>📦 기간 할 일</summary>'+G.map(g=>'<h3>'+esc(gLabel(g.label))+'</h3>'+tItems(g.items)).join("")+'</details>';
   if(later.length)h+='<details class="card tc tg"><summary>🔭 그 다음 학교 일정</summary>'+later.map(x=>'<h3>'+esc(x.label)+'</h3>'+tItems(x.items)).join("")+'</details>';
   put("extra",h);
-  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v20';
+  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v21';
 }
 document.addEventListener("click",e=>{const b=e.target.closest(".lcp");if(!b)return;const u=b.dataset.url,ok=()=>{b.textContent="복사됨 ✓";setTimeout(()=>b.textContent="🔗 복사",1500)};
   const fb=()=>{const ta=document.createElement("textarea");ta.value=u;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();let k=false;try{k=document.execCommand("copy")}catch(x){}ta.remove();if(k)ok();else prompt("길게 눌러 복사하세요",u)};
