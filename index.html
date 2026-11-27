@@ -601,6 +601,7 @@ const W="일월화수목금토";
 let i=0;
 const ARCH=Array.isArray(RAW.archive)?RAW.archive:[];let ARC=false; // 🗂 지난 기록
 let DONE=new Set(Array.isArray(RAW.done)?RAW.done:[]); // ✓ 완료한 학교 일 (편집 모드에서 체크)
+[...(TEACH.days||[]),...(TEACH.groups||[])].forEach(x=>(x.items||[]).forEach(o=>{if(o.dn&&o.id)DONE.add(o.id)})); // 11/27: A에서 ✓완료한 🏫 줄(dn)도 J에서 완료로 (전엔 안 끝난 줄처럼 다시 떴음)
 const nowHM=()=>new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Seoul",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date());
 function tkNowDot(root,selSec){ // 오늘 일정: 지금 시각 위치에 반짝이는 점 (시각 사이는 비율대로 이동)
   const sec=root&&root.querySelector(selSec||".notice-card .tk-sec");if(!sec)return;
@@ -943,7 +944,7 @@ function extras(){ // 🔭 그 다음 학교 일정 = 지금 고른 날짜 탭 �
   if(G.length)h+='<details class="card tc tg" open><summary>📦 기간 할 일</summary>'+G.map(g=>'<h3>'+esc(gLabel(g.label))+'</h3>'+tItems(g.items)).join("")+'</details>';
   if(later.length)h+='<details class="card tc tg"><summary>🔭 그 다음 학교 일정</summary>'+later.map(x=>'<h3>'+esc(x.label)+'</h3>'+tItems(x.items)).join("")+'</details>';
   put("extra",h);
-  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v18';
+  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v19';
 }
 document.addEventListener("click",e=>{const b=e.target.closest(".lcp");if(!b)return;const u=b.dataset.url,ok=()=>{b.textContent="복사됨 ✓";setTimeout(()=>b.textContent="🔗 복사",1500)};
   const fb=()=>{const ta=document.createElement("textarea");ta.value=u;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();let k=false;try{k=document.execCommand("copy")}catch(x){}ta.remove();if(k)ok();else prompt("길게 눌러 복사하세요",u)};
