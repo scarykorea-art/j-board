@@ -671,8 +671,8 @@ function ickSave(d,c,s){LS.set("jck:"+d+":"+c,{ck:[...s.ck],out:s.out,t:nowHM()}
 function ickModel(d,c){ // 반 c, 날짜 d: 있어야 하는 학생(pres) / 빠진 학생(gone)
   const C=(JR.cls||[]).find(o=>o.c===c);if(!C)return null;
   const S=ickState(d,c),auto={},tag={},hm=nowHM();
-  C.s.forEach(([no,n,f])=>{if(f)auto[no]=f});
   const A=c===2&&JR.att2&&JR.att2[d];
+  C.s.forEach(([no,n,f])=>{if(f&&!(A&&A.list))auto[no]=f}); // 명렬표 '위탁' 표시는 기본값 — 2반은 D 출결이 있는 날이면 D대로 (11/27: 2/2 위탁생 출석인데 25명 뜨던 것)
   if(A&&A.list){const L=A.list,put=(k,why)=>(L[k]||[]).forEach(o=>{if(o.no)auto[o.no]=why});
     put("trip","교외체험");put("rec","인정결석");put("abs","결석");put("wait","지각 예정");put("pend","확인 중");put("etc","위탁");
     (L.late||[]).forEach(o=>{if(o.no)tag[o.no]="지각"});
@@ -951,7 +951,7 @@ function extras(){ // 🔭 그 다음 학교 일정 = 지금 고른 날짜 탭 �
   if(G.length)h+='<details class="card tc tg" open><summary>📦 기간 할 일</summary>'+G.map(g=>'<h3>'+esc(gLabel(g.label))+'</h3>'+tItems(g.items)).join("")+'</details>';
   if(later.length)h+='<details class="card tc tg"><summary>🔭 그 다음 학교 일정</summary>'+later.map(x=>'<h3>'+esc(x.label)+'</h3>'+tItems(x.items)).join("")+'</details>';
   put("extra",h);
-  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v21';
+  document.getElementById("foot").innerHTML='3학년부 데일리 보드 · '+esc(TEACH.at?TEACH.at+' 기준':'아직 안 넘어옴')+(RAW.url?' · <a href="'+esc(RAW.url)+'">새로고침</a>':'')+' · 화면 v22';
 }
 document.addEventListener("click",e=>{const b=e.target.closest(".lcp");if(!b)return;const u=b.dataset.url,ok=()=>{b.textContent="복사됨 ✓";setTimeout(()=>b.textContent="🔗 복사",1500)};
   const fb=()=>{const ta=document.createElement("textarea");ta.value=u;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();let k=false;try{k=document.execCommand("copy")}catch(x){}ta.remove();if(k)ok();else prompt("길게 눌러 복사하세요",u)};
